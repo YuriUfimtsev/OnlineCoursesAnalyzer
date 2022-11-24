@@ -1,9 +1,100 @@
 ﻿@page "/"
+@inject HttpClient Http
+@using OnlineCoursesAnalyzer.Templates;
 
-<PageTitle>Index</PageTitle>
+<PageTitle>OnlineCoursesAnalyzer</PageTitle>
+<div class="container">
+<div class="row">
+        <div class="col-6 d-grid">
+        <h5>Поле для данных об успеваемости</h5>
+        <div class="upload-container @hoverClass">
+                <img id="upload-image" src="uploadContainerImg.svg">
+            <InputFile id="file-input" OnChange="@LoadEducationalAchievementDataFile" @ondragover="OnDragover" @ondragleave="OnDragleave" />
+            <p text-align>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
+        </div>
+            <h6>Добавлен: @currentFileName</h6>
+    </div>
+    <div class="col-6 d-grid">
+            <h5>Поле для данных о результатах прокторинга</h5>
+        <div class="upload-container @hoverClass">
+                <img id="upload-image" src="uploadContainerImg.svg">
+            <InputFile id="file-input" OnChange="@LoadProctoringStatusDataFile" @ondragover="OnDragover" @ondragleave="OnDragleave" />
+            <p text-align>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
+        </div>
+            <h6>Добавлен: @currentFileName</h6>
+    </div>
+</div>
 
-<h1>Hello, world!</h1>
+<div class="row">
+        <div class="col-3 d-grid">
+            <button type="button" class="btn btn-outline-dark btn-block" onclick="@ShowResult">
+            Получить результат
+            </button>
+        </div>
+        <div class="col-9">
+            <div class="message-block @validationClass">@message</div>
+        </div>
+</div>
+</div>
 
-Welcome to your new app.
+@code {
+    private Student[]? students;
+    private string hoverClass;
+    private string validationClass;
+    private string? message;
+    private string? currentFileName;
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    public Index()
+    {
+        this.hoverClass = string.Empty;
+        this.validationClass = string.Empty;
+    }
+
+    public class Student
+    {
+        public string SecondName { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string Patronymic { get; set; }
+
+        public string Assessment { get; set; }
+
+        public string ProctoringStatus { get; set; }
+
+        public Student()
+        {
+        }
+    }
+
+    private void OnDragover() => this.hoverClass = "hover";
+
+    private void OnDragleave() => this.hoverClass = string.Empty;
+
+    private void Successfully(string text)
+    {
+        this.validationClass = "successfull";
+        this.message = text;
+    }
+
+    private void Unsuccessfully(string text)
+    {
+        this.validationClass = "unsuccessfull";
+        this.message = text;
+    }
+
+    private void ShowResult()
+    {
+
+    }
+
+    private void LoadEducationalAchievementDataFile(InputFileChangeEventArgs inputFile)
+    {
+
+    }
+
+    private void LoadProctoringStatusDataFile(InputFileChangeEventArgs inputFile)
+    {
+
+    }
+}
