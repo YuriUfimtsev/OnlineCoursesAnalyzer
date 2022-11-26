@@ -1,6 +1,7 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
-html, body {
+html,
+body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -12,7 +13,8 @@ h3 {
     text-align: center;
 }
 
-a, .btn-link {
+a,
+.btn-link {
     color: #0071c1;
 }
 
@@ -30,12 +32,12 @@ a, .btn-link {
 }
 
     .nav-item a.active {
-        background-color: rgba(255,255,255,0.25);
+        background-color: rgba(255, 255, 255, 0.25);
         color: white;
     }
 
     .nav-item a:hover {
-        background-color: rgba(255,255,255,0.1);
+        background-color: rgba(255, 255, 255, 0.1);
         color: white;
     }
 
@@ -87,7 +89,6 @@ body {
     }
 
 @media (min-width: 768px) {
-
     .navbar-toggler {
         display: none;
     }
@@ -102,11 +103,6 @@ body {
     height: 100%;
 }
 
-btn.btn-outline-dark.full-area-button {
-    float: left;
-    width: auto;
-}
-
 .upload-container {
     display: flex;
     justify-content: center;
@@ -117,7 +113,7 @@ btn.btn-outline-dark.full-area-button {
     outline: 2px dashed #5d5d5d;
     outline-offset: -10px;
     background-color: #e0f2f7;
-    font-family: 'Segoe UI';
+    font-family: 'Segoe UI', sans-serif;
     color: #1f3c44;
     text-align: left;
 }
@@ -167,5 +163,5 @@ btn.btn-outline-dark.full-area-button {
 }
 
     .blazor-error-boundary::after {
-        content: "An error has occurred."
+        content: "An error has occurred.";
     }
