@@ -4,67 +4,71 @@
 
 <PageTitle>OnlineCoursesAnalyzer</PageTitle>
 <div class="container">
-<div class="row">
+    <div class="row">
         <div class="col-6 d-grid">
-        <h5>Поле для данных об успеваемости</h5>
-        <div class="upload-container @hoverClass">
+            <h5>Поле для данных об успеваемости</h5>
+            <div class="upload-container @hoverClass">
                 <img id="upload-image" src="uploadContainerImg.svg">
-            <InputFile id="file-input" OnChange="@LoadEducationalAchievementDataFile" @ondragover="OnDragover" @ondragleave="OnDragleave" />
-            <p text-align>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
-        </div>
+                <InputFile id="file-input" OnChange="@LoadEducationalAchievementDataFile" @ondragover="OnDragover" @ondragleave="OnDragleave" />
+                <p text-align>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
+            </div>
             <h6>Добавлен: @currentFileName</h6>
-    </div>
-    <div class="col-6 d-grid">
+        </div>
+        <div class="col-6 d-grid">
             <h5>Поле для данных о результатах прокторинга</h5>
-        <div class="upload-container @hoverClass">
+            <div class="upload-container @hoverClass">
                 <img id="upload-image" src="uploadContainerImg.svg">
-            <InputFile id="file-input" OnChange="@LoadProctoringStatusDataFile" @ondragover="OnDragover" @ondragleave="OnDragleave" />
-            <p text-align>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
-        </div>
+                <InputFile id="file-input" OnChange="@LoadProctoringStatusDataFile" @ondragover="OnDragover" @ondragleave="OnDragleave" />
+                <p text-align>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
+            </div>
             <h6>Добавлен: @currentFileName</h6>
+        </div>
     </div>
-</div>
 
-<div class="row">
+    <div class="row">
         <div class="col-3 d-grid">
-            <button type="button" class="btn btn-outline-dark btn-block" onclick="@ShowResult">
+            <button type="button" class="btn btn-outline-dark btn-block" @onclick="GetResult">
             Получить результат
             </button>
         </div>
         <div class="col-9">
             <div class="message-block @validationClass">@message</div>
         </div>
-</div>
+    </div>
+
+    <div class="row">
+        <TableTemplate Items="this.students" TItem="Student">
+            <TableHeader>
+                <th>Фамилия</th>
+                <th>Имя</th>
+                <th>Отчество</th>
+                <th>Оценка</th>
+                <th>Статус прокторинга</th>
+            </TableHeader>
+            <RowTemplate>
+                <td>@context.SecondName</td>
+                <td>@context.FirstName</td>
+                <td>@context.LastName</td>
+                <td>@context.Grade</td>
+                <td>@context.ProctoringStatus</td>
+            </RowTemplate>
+        </TableTemplate>
+    </div>
 </div>
 
 @code {
-    private Student[]? students;
+    private List<Student>? students;
     private string hoverClass;
     private string validationClass;
     private string? message;
     private string? currentFileName;
+    private DataHandler dataHandler;
 
     public Index()
     {
         this.hoverClass = string.Empty;
         this.validationClass = string.Empty;
-    }
-
-    public class Student
-    {
-        public string SecondName { get; set; }
-
-        public string FirstName { get; set; }
-
-        public string Patronymic { get; set; }
-
-        public string Assessment { get; set; }
-
-        public string ProctoringStatus { get; set; }
-
-        public Student()
-        {
-        }
+        this.dataHandler = new DataHandler();
     }
 
     private void OnDragover() => this.hoverClass = "hover";
@@ -83,18 +87,28 @@
         this.message = text;
     }
 
-    private void ShowResult()
+    private void GetResult()
     {
-
+        this.students = this.dataHandler.GetResult();
     }
 
-    private void LoadEducationalAchievementDataFile(InputFileChangeEventArgs inputFile)
+    private async void LoadEducationalAchievementDataFile(InputFileChangeEventArgs eventArgs)
     {
-
+        var file = eventArgs.File;
+        using(var memoryStream = new MemoryStream())
+        {
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            this.dataHandler.AddEducationalAchievementData(memoryStream);
+        }
     }
 
-    private void LoadProctoringStatusDataFile(InputFileChangeEventArgs inputFile)
+    private async void LoadProctoringStatusDataFile(InputFileChangeEventArgs eventArgs)
     {
-
+        var file = eventArgs.File;
+        using (var memoryStream = new MemoryStream())
+        {
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            this.dataHandler.AddProctoringStatusData(memoryStream);
+        }
     }
 }

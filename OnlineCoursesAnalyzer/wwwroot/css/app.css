@@ -103,6 +103,11 @@ body {
     height: 100%;
 }
 
+btn.btn-outline-dark.full-area-button {
+    float: left;
+    width: auto;
+}
+
 .upload-container {
     display: flex;
     justify-content: center;
