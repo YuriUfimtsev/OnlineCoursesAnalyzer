@@ -103,7 +103,7 @@ body {
     height: 100%;
 }
 
-btn.btn-outline-dark.full-area-button {
+.btn.btn-outline-dark.full-area-button {
     float: left;
     width: auto;
 }

@@ -4,39 +4,25 @@ namespace OnlineCoursesAnalyzer;
 
 public class DataHandler
 {
-    // Numbering columns from one.
-    private static readonly int[] RequiredColumnNumbersFromEducationalAchievementDataFile =
+    private static readonly string[] RequiredColumnsFromEducationalAchievementDataFile =
     {
-        (int)EducationalAchievementDataFileColumns.Email,
-        (int)EducationalAchievementDataFileColumns.SecondName,
-        (int)EducationalAchievementDataFileColumns.FirstName,
-        (int)EducationalAchievementDataFileColumns.LastName,
-        (int)EducationalAchievementDataFileColumns.GradePercent,
+        EducationalAchievementDataFile.Email,
+        EducationalAchievementDataFile.SecondName,
+        EducationalAchievementDataFile.FirstName,
+        EducationalAchievementDataFile.LastName,
+        EducationalAchievementDataFile.GradePercent,
     };
 
-    private static readonly int[] RequiredColumnNumbersFromProctoringStatusDataFile =
+    private static readonly string[] RequiredColumnsFromProctoringStatusDataFile =
     {
-        (int)ProctoringStatusDataFileColumns.Email,
-        (int)ProctoringStatusDataFileColumns.ProctoringStatus,
+        ProctoringStatusDataFile.Email,
+        ProctoringStatusDataFile.ProctoringStatus,
     };
 
     private Dictionary<string, Student>? educationalAchievementData;
     private Dictionary<string, string>? proctoringStatusData;
-
-    private enum EducationalAchievementDataFileColumns : int
-    {
-        Email = 2,
-        SecondName = 6,
-        FirstName = 5,
-        LastName = 4,
-        GradePercent = 8,
-    }
-
-    private enum ProctoringStatusDataFileColumns : int
-    {
-        Email = 2,
-        ProctoringStatus = 6,
-    }
+    private List<Student>? studentsData;
+    private bool isNotNullDataActual;
 
     private enum Grades
     {
@@ -50,8 +36,8 @@ public class DataHandler
 
     public void AddEducationalAchievementData(Stream fileReadStream)
     {
-        var educationalAchievmentDataList = XLXSParser.GetDataFromColumns(
-            fileReadStream, RequiredColumnNumbersFromEducationalAchievementDataFile); /////
+        var educationalAchievmentDataList = XLXSParser.GetDataFromColumnsWithoutFirstRow(
+            fileReadStream, RequiredColumnsFromEducationalAchievementDataFile);
         var educationalAchievmentDataDictionary = new Dictionary<string, Student>();
         foreach (var studentData in educationalAchievmentDataList)
         {
@@ -61,12 +47,13 @@ public class DataHandler
         }
 
         this.educationalAchievementData = educationalAchievmentDataDictionary;
+        this.isNotNullDataActual = false;
     }
 
     public void AddProctoringStatusData(Stream fileReadStream)
     {
-        var proctoringStatusDataList = XLXSParser.GetDataFromColumns(
-            fileReadStream, RequiredColumnNumbersFromProctoringStatusDataFile);
+        var proctoringStatusDataList = XLXSParser.GetDataFromColumnsWithoutFirstRow(
+            fileReadStream, RequiredColumnsFromProctoringStatusDataFile);
         var proctoringStatusDataDictionary = new Dictionary<string, string>();
         foreach (var studentData in proctoringStatusDataList)
         {
@@ -74,16 +61,22 @@ public class DataHandler
         }
 
         this.proctoringStatusData = proctoringStatusDataDictionary;
+        this.isNotNullDataActual = false;
     }
 
     public List<Student>? GetResult()
     {
+        if (this.isNotNullDataActual)
+        {
+            return this.studentsData;
+        }
+
         if (this.educationalAchievementData == null || this.proctoringStatusData == null)
         {
             return null;
         }
 
-        if (this.educationalAchievementData.Count != this.proctoringStatusData.Count) // Сложность вычисления Count узнать
+        if (this.educationalAchievementData.Count != this.proctoringStatusData.Count)
         {
             // do smth
         }
@@ -101,6 +94,8 @@ public class DataHandler
 
         studentsData.Sort((firstElement, secondElement)
             => firstElement.SecondName.CompareTo(secondElement.SecondName));
+        this.studentsData = studentsData;
+        this.isNotNullDataActual = true;
         return studentsData;
     }
 
@@ -116,5 +111,25 @@ public class DataHandler
             >= 50 => Grades.E,
             _ => Grades.F,
         };
+    }
+
+    private static class EducationalAchievementDataFile
+    {
+        public static string Email => "Email";
+
+        public static string SecondName => "Second Name";
+
+        public static string FirstName => "First Name";
+
+        public static string LastName => "Last Name";
+
+        public static string GradePercent => "Grade percent";
+    }
+
+    private static class ProctoringStatusDataFile
+    {
+        public static string Email => "User";
+
+        public static string ProctoringStatus => "Status is correct";
     }
 }

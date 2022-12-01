@@ -3,7 +3,9 @@
 namespace OnlineCoursesAnalyzer;
 public static class XLXSParser
 {
-    public static List<string[]> GetDataFromColumns(Stream stream, int[] requiredColumnNumbers)
+    public static List<string[]> GetDataFromColumnsWithoutFirstRow(
+        Stream stream,
+        string[] requiredColumnNames)
     {
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -11,8 +13,8 @@ public static class XLXSParser
         using var package = new ExcelPackage(stream);
 
         var worksheet = package.Workbook.Worksheets[0];
-        for (var i = 2 /* Считаем первую строчку - названиями колонок, поэтому парсим со второй.*/;
-            i < worksheet.Dimension.Rows; ++i)
+        var requiredColumnNumbers = GetColumnNumbersFromNames(worksheet, requiredColumnNames);
+        for (var i = 2; i < worksheet.Dimension.Rows; ++i)
         {
             var (rowData, isNullRow) = GetRowData(worksheet, i, requiredColumnNumbers);
             if (!isNullRow)
@@ -22,6 +24,22 @@ public static class XLXSParser
         }
 
         return allRowsData;
+    }
+
+    private static int[] GetColumnNumbersFromNames(ExcelWorksheet sheet, string[] requiredColumnNames)
+    {
+        var requiredColumnNumbers = new int[requiredColumnNames.Length];
+        for (var i = 0; i < requiredColumnNames.Length; ++i)
+        {
+            var columnNumber = sheet
+                .Cells["1:1"]
+                .First(c => Equals(c.Value.ToString(), requiredColumnNames[i]))
+                .Start
+                .Column;
+            requiredColumnNumbers[i] = columnNumber;
+        }
+
+        return requiredColumnNumbers;
     }
 
     private static (string?[] RowData, bool IsNullRow) GetRowData(
