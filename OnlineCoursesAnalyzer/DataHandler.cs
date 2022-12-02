@@ -21,7 +21,7 @@ public class DataHandler
 
     private Dictionary<string, Student>? educationalAchievementData;
     private Dictionary<string, string>? proctoringStatusData;
-    private List<Student>? studentsData;
+    private List<(Student, bool)>? studentsDataWithExplicitProctoringStatus;
     private bool isNotNullDataActual;
 
     private enum Grades
@@ -64,11 +64,11 @@ public class DataHandler
         this.isNotNullDataActual = false;
     }
 
-    public List<Student>? GetResult()
+    public List<(Student, bool)>? GetResultWithExplicitProctoringStatus()
     {
         if (this.isNotNullDataActual)
         {
-            return this.studentsData;
+            return this.studentsDataWithExplicitProctoringStatus;
         }
 
         if (this.educationalAchievementData == null || this.proctoringStatusData == null)
@@ -81,7 +81,7 @@ public class DataHandler
             // do smth
         }
 
-        var studentsData = new List<Student>();
+        var studentsData = new List<(Student, bool)>();
         foreach (var student in this.educationalAchievementData)
         {
             if (this.proctoringStatusData.ContainsKey(student.Key))
@@ -89,14 +89,26 @@ public class DataHandler
                 student.Value.ProctoringStatus = this.proctoringStatusData[student.Key];
             }
 
-            studentsData.Add(student.Value);
+            var proctoringData = InterpretProctoringStatus(student.Value, studentsData.Count);
+            studentsData.Add((student.Value, proctoringData));
         }
 
         studentsData.Sort((firstElement, secondElement)
-            => firstElement.SecondName.CompareTo(secondElement.SecondName));
-        this.studentsData = studentsData;
+            => firstElement.Item1.SecondName.CompareTo(secondElement.Item1.SecondName));
+        this.studentsDataWithExplicitProctoringStatus = studentsData;
         this.isNotNullDataActual = true;
+
         return studentsData;
+    }
+
+    private static bool InterpretProctoringStatus(Student studentData, int count)
+    {
+        return studentData.ProctoringStatus switch
+        {
+            ProctoringStatusDataFile.ProctoringStatusIsTrue => true,
+            ProctoringStatusDataFile.ProctoringStatusIsFalse => false,
+            _ => throw new Exception(), ////
+        };
     }
 
     private static Grades GetGrade(string gradePercent)
@@ -115,21 +127,25 @@ public class DataHandler
 
     private static class EducationalAchievementDataFile
     {
-        public static string Email => "Email";
+        public const string Email = "Email";
 
-        public static string SecondName => "Second Name";
+        public const string SecondName = "Second Name";
 
-        public static string FirstName => "First Name";
+        public const string FirstName = "First Name";
 
-        public static string LastName => "Last Name";
+        public const string LastName = "Last Name";
 
-        public static string GradePercent => "Grade percent";
+        public const string GradePercent = "Grade percent";
     }
 
     private static class ProctoringStatusDataFile
     {
-        public static string Email => "User";
+        public const string Email = "User";
 
-        public static string ProctoringStatus => "Status is correct";
+        public const string ProctoringStatus = "Status is correct";
+
+        public const string ProctoringStatusIsTrue = "yes";
+
+        public const string ProctoringStatusIsFalse = "no";
     }
 }

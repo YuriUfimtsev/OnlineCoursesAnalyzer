@@ -51,11 +51,14 @@ public static class XLXSParser
         var rowData = new string?[requiredColumnNumbers.Length];
         for (var j = 0; j < requiredColumnNumbers.Length; ++j)
         {
-            rowData[j] = sheet.Cells[rowNumber, requiredColumnNumbers[j]].Value.ToString();
-            if (rowData[j] == null)
+            var value = sheet.Cells[rowNumber, requiredColumnNumbers[j]].Value;
+            if (value == null)
             {
                 isNullRow = true;
+                return (rowData, isNullRow); // Сообщать, что есть null-строка
             }
+
+            rowData[j] = value.ToString();
         }
 
         return (rowData, isNullRow);

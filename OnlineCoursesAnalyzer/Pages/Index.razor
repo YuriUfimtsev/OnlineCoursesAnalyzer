@@ -57,7 +57,7 @@
 </div>
 
 @code {
-    private List<Student>? students;
+    private List<(Student, bool)>? students;
     private string hoverClass;
     private string validationClass;
     private string? message;
@@ -89,7 +89,7 @@
 
     private void GetResult()
     {
-        this.students = this.dataHandler.GetResult();
+        this.students = this.dataHandler.GetResultWithExplicitProctoringStatus();
     }
 
     private async void LoadEducationalAchievementDataFile(InputFileChangeEventArgs eventArgs)

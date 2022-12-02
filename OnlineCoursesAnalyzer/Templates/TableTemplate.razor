@@ -10,9 +10,10 @@
         {
             foreach (var item in Items)
             {
+                var backgroundColorClass = item.Item2 ? "standart" : "outstanding";
                 if (RowTemplate is not null)
                 {
-                    <tr>@RowTemplate(item)</tr>
+                    <tr class =@backgroundColorClass>@RowTemplate(item.Item1)</tr>
                 }
             }
         }
@@ -27,5 +28,5 @@
     public RenderFragment<TItem>? RowTemplate { get; set; }
 
     [Parameter, AllowNull]
-    public IReadOnlyList<TItem>? Items { get; set; }
+    public IReadOnlyList<(TItem, bool)>? Items { get; set; }
 }

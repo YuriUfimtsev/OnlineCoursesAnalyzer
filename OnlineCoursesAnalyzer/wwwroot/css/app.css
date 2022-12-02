@@ -13,6 +13,14 @@ h3 {
     text-align: center;
 }
 
+.standart {
+    background-color: white;
+}
+
+.outstanding {
+    background-color: #b32121;
+}
+
 a,
 .btn-link {
     color: #0071c1;
