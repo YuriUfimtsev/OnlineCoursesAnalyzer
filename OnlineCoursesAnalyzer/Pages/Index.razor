@@ -1,38 +1,51 @@
 ﻿@page "/"
 @inject HttpClient Http
 @using OnlineCoursesAnalyzer.Templates;
+@using OnlineCoursesAnalyzer.Data;
+@using OnlineCoursesAnalyzer.DataHandling;
 
 <PageTitle>OnlineCoursesAnalyzer</PageTitle>
 <div class="container">
     <div class="row">
         <div class="col-6 d-grid">
             <h5>Поле для данных об успеваемости</h5>
-            <div class="upload-container @hoverClass">
-                <img id="upload-image" src="uploadContainerImg.svg">
-                <InputFile id="file-input" OnChange="@LoadEducationalAchievementDataFile" @ondragover="OnDragover" @ondragleave="OnDragleave" />
-                <p text-align>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
-            </div>
-            <h6>Добавлен: @currentFileName</h6>
         </div>
         <div class="col-6 d-grid">
             <h5>Поле для данных о результатах прокторинга</h5>
-            <div class="upload-container @hoverClass">
-                <img id="upload-image" src="uploadContainerImg.svg">
-                <InputFile id="file-input" OnChange="@LoadProctoringStatusDataFile" @ondragover="OnDragover" @ondragleave="OnDragleave" />
-                <p text-align>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
-            </div>
-            <h6>Добавлен: @currentFileName</h6>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-2">
+        <div class="col-6 d-grid">
+            <div class="upload-container @firstContainerHoverClass">
+                <img src="uploadContainerImg.svg">
+                    <InputFile OnChange="@LoadEducationalAchievementDataFile" @ondragover="OnFirstContainerDragover"
+                    @ondragleave="OnFirstContainerDragleave" />
+                <p>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
+            </div>
+            <h6>Добавлен: @educationalAchievementDataFileName</h6>
+        </div>
+        <div class="col-6 d-grid">
+            <div class="upload-container @secondContainerHoverClass">
+                <img src="uploadContainerImg.svg">
+                <InputFile OnChange="@LoadProctoringStatusDataFile" @ondragover="OnSecondContainerDragover"
+                    @ondragleave="OnSecondContainerDragleave" />
+                <p>Нажмите, чтобы добавить файл <br />или переместите его сюда.</p>
+            </div>
+            <h6>Добавлен: @proctoringStatusDataFileName</h6>
+        </div>
+    </div>
+
+    <div class="row g-2">
         <div class="col-3 d-grid">
             <button type="button" class="btn btn-outline-dark btn-block" @onclick="GetResult">
             Получить результат
             </button>
         </div>
         <div class="col-9">
-            <div class="message-block @validationClass">@message</div>
+            <div class="alert @validationClass" role="alert">
+                @message
+            </div>
         </div>
     </div>
 
@@ -58,57 +71,123 @@
 
 @code {
     private List<(Student, bool)>? students;
-    private string hoverClass;
+    private string firstContainerHoverClass;
+    private string secondContainerHoverClass;
     private string validationClass;
     private string? message;
-    private string? currentFileName;
+    private string? educationalAchievementDataFileName;
+    private string? proctoringStatusDataFileName;
     private DataHandler dataHandler;
 
     public Index()
     {
-        this.hoverClass = string.Empty;
         this.validationClass = string.Empty;
         this.dataHandler = new DataHandler();
+        this.firstContainerHoverClass = string.Empty;
+        this.secondContainerHoverClass = string.Empty;
+        this.validationClass = "standart";
     }
 
-    private void OnDragover() => this.hoverClass = "hover";
+    private void OnFirstContainerDragover() => this.firstContainerHoverClass = "hover";
 
-    private void OnDragleave() => this.hoverClass = string.Empty;
+    private void OnSecondContainerDragover() => this.secondContainerHoverClass = "hover";
 
-    private void Successfully(string text)
+    private void OnFirstContainerDragleave() => this.firstContainerHoverClass = string.Empty;
+
+    private void OnSecondContainerDragleave() => this.secondContainerHoverClass = string.Empty;
+
+    private void Successfully(string message)
     {
-        this.validationClass = "successfull";
-        this.message = text;
+        this.validationClass = "alert-success";
+        this.message = message;
     }
 
-    private void Unsuccessfully(string text)
+    private void Unsuccessfully(string message)
     {
-        this.validationClass = "unsuccessfull";
-        this.message = text;
+        this.validationClass = "alert-danger";
+        this.message = message;
     }
 
-    private void GetResult()
+    private void Standart(string message)
     {
-        this.students = this.dataHandler.GetResultWithExplicitProctoringStatus();
+        this.validationClass = "standart";
+        this.message = message;
     }
 
-    private async void LoadEducationalAchievementDataFile(InputFileChangeEventArgs eventArgs)
+    private void ShowAddedFileName(string fileName, FileType fileType)
     {
-        var file = eventArgs.File;
-        using(var memoryStream = new MemoryStream())
+        switch (fileType)
         {
-            await file.OpenReadStream().CopyToAsync(memoryStream);
-            this.dataHandler.AddEducationalAchievementData(memoryStream);
+            case FileType.EducationalAchievementData: this.educationalAchievementDataFileName = fileName;
+                break;
+            case FileType.ProctoringStatusData: this.proctoringStatusDataFileName = fileName;
+                break;
         }
     }
 
-    private async void LoadProctoringStatusDataFile(InputFileChangeEventArgs eventArgs)
+    private async Task GetResult()
     {
-        var file = eventArgs.File;
-        using (var memoryStream = new MemoryStream())
+        Standart("Обработка данных");
+        await Task.Delay(1);
+        OnFirstContainerDragleave();
+        OnSecondContainerDragleave();
+        try
         {
-            await file.OpenReadStream().CopyToAsync(memoryStream);
-            this.dataHandler.AddProctoringStatusData(memoryStream);
+            this.students = this.dataHandler.GetResultWithExplicitProctoringStatus();
+            Successfully("Обработка данных завершена корректно");
         }
+        catch (InvalidInputDataException invalidInputDataException)
+        {
+            Unsuccessfully(invalidInputDataException.Message);
+        }
+    }
+
+    private async Task LoadEducationalAchievementDataFile(InputFileChangeEventArgs eventArgs)
+        => await LoadDataFile(eventArgs, FileType.EducationalAchievementData);
+
+    private async Task LoadProctoringStatusDataFile(InputFileChangeEventArgs eventArgs)
+        => await LoadDataFile(eventArgs, FileType.ProctoringStatusData);
+
+    private async Task LoadDataFile(InputFileChangeEventArgs eventArgs, FileType fileType)
+    {
+        switch (fileType)
+        {
+            case FileType.EducationalAchievementData:
+                OnFirstContainerDragleave();
+                break;
+            case FileType.ProctoringStatusData:
+                OnSecondContainerDragleave();
+                break;
+        }
+
+        var file = eventArgs.File;
+        using var memoryStream = new MemoryStream();
+        Standart($"Файл '{file.Name}' загружается");
+        await file.OpenReadStream().CopyToAsync(memoryStream);
+        try
+        {
+            switch (fileType)
+            {
+                case FileType.EducationalAchievementData:
+                    this.dataHandler.AddEducationalAchievementData(memoryStream);
+                    break;
+                case FileType.ProctoringStatusData:
+                    this.dataHandler.AddProctoringStatusData(memoryStream);
+                    break;
+            }
+
+            Successfully($"Файл '{file.Name}' успешно загружен");
+            ShowAddedFileName(file.Name, fileType);
+        }
+        catch (InvalidInputDataException invalidInputDataException)
+        {
+            Unsuccessfully(invalidInputDataException.Message);
+        }
+    }
+
+    private enum FileType
+    {
+        EducationalAchievementData,
+        ProctoringStatusData,
     }
 }

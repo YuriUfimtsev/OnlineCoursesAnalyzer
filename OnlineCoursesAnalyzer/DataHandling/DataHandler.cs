@@ -1,22 +1,23 @@
 ﻿using System.Globalization;
+using OnlineCoursesAnalyzer.Data;
 
-namespace OnlineCoursesAnalyzer;
+namespace OnlineCoursesAnalyzer.DataHandling;
 
 public class DataHandler
 {
-    private static readonly string[] RequiredColumnsFromEducationalAchievementDataFile =
+    private static readonly string[] RequiredDataFromEducationalAchievementFile =
     {
-        EducationalAchievementDataFile.Email,
-        EducationalAchievementDataFile.SecondName,
-        EducationalAchievementDataFile.FirstName,
-        EducationalAchievementDataFile.LastName,
-        EducationalAchievementDataFile.GradePercent,
+        EducationalAchievementFile.EmailColumn,
+        EducationalAchievementFile.SecondNameColumn,
+        EducationalAchievementFile.FirstNameColumn,
+        EducationalAchievementFile.LastNameColumn,
+        EducationalAchievementFile.GradePercentColumn,
     };
 
-    private static readonly string[] RequiredColumnsFromProctoringStatusDataFile =
+    private static readonly string[] RequiredDataFromProctoringStatusFile =
     {
-        ProctoringStatusDataFile.Email,
-        ProctoringStatusDataFile.ProctoringStatus,
+        ProctoringStatusFile.EmailColumn,
+        ProctoringStatusFile.ProctoringStatusColumn,
     };
 
     private Dictionary<string, Student>? educationalAchievementData;
@@ -24,24 +25,14 @@ public class DataHandler
     private List<(Student, bool)>? studentsDataWithExplicitProctoringStatus;
     private bool isNotNullDataActual;
 
-    private enum Grades
-    {
-        A,
-        B,
-        C,
-        D,
-        E,
-        F,
-    }
-
     public void AddEducationalAchievementData(Stream fileReadStream)
     {
         var educationalAchievmentDataList = XLXSParser.GetDataFromColumnsWithoutFirstRow(
-            fileReadStream, RequiredColumnsFromEducationalAchievementDataFile);
+            fileReadStream, RequiredDataFromEducationalAchievementFile);
         var educationalAchievmentDataDictionary = new Dictionary<string, Student>();
         foreach (var studentData in educationalAchievmentDataList)
         {
-            var grade = GetGrade(studentData[4]);
+            var grade = Grade.GetGrade(studentData[4]);
             var student = new Student(studentData[1], studentData[2], studentData[3], grade.ToString());
             educationalAchievmentDataDictionary.Add(studentData[0], student);
         }
@@ -53,7 +44,7 @@ public class DataHandler
     public void AddProctoringStatusData(Stream fileReadStream)
     {
         var proctoringStatusDataList = XLXSParser.GetDataFromColumnsWithoutFirstRow(
-            fileReadStream, RequiredColumnsFromProctoringStatusDataFile);
+            fileReadStream, RequiredDataFromProctoringStatusFile);
         var proctoringStatusDataDictionary = new Dictionary<string, string>();
         foreach (var studentData in proctoringStatusDataList)
         {
@@ -105,47 +96,9 @@ public class DataHandler
     {
         return studentData.ProctoringStatus switch
         {
-            ProctoringStatusDataFile.ProctoringStatusIsTrue => true,
-            ProctoringStatusDataFile.ProctoringStatusIsFalse => false,
+            ProctoringStatusFile.ProctoringStatusIsTrue => true,
+            ProctoringStatusFile.ProctoringStatusIsFalse => false,
             _ => throw new Exception(), ////
         };
-    }
-
-    private static Grades GetGrade(string gradePercent)
-    {
-        var percent = (int)Math.Truncate(float.Parse(gradePercent, CultureInfo.InvariantCulture));
-        return percent switch
-        {
-            >= 90 => Grades.A,
-            >= 80 => Grades.B,
-            >= 70 => Grades.C,
-            >= 61 => Grades.D,
-            >= 50 => Grades.E,
-            _ => Grades.F,
-        };
-    }
-
-    private static class EducationalAchievementDataFile
-    {
-        public const string Email = "Email";
-
-        public const string SecondName = "Second Name";
-
-        public const string FirstName = "First Name";
-
-        public const string LastName = "Last Name";
-
-        public const string GradePercent = "Grade percent";
-    }
-
-    private static class ProctoringStatusDataFile
-    {
-        public const string Email = "User";
-
-        public const string ProctoringStatus = "Status is correct";
-
-        public const string ProctoringStatusIsTrue = "yes";
-
-        public const string ProctoringStatusIsFalse = "no";
     }
 }

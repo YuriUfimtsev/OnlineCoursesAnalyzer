@@ -1,6 +1,6 @@
 ﻿using OfficeOpenXml;
 
-namespace OnlineCoursesAnalyzer;
+namespace OnlineCoursesAnalyzer.DataHandling;
 public static class XLXSParser
 {
     public static List<string[]> GetDataFromColumnsWithoutFirstRow(

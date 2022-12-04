@@ -1,4 +1,4 @@
-﻿namespace OnlineCoursesAnalyzer;
+﻿namespace OnlineCoursesAnalyzer.Data;
 
 public class Student
 {
