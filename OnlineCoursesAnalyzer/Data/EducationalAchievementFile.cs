@@ -11,4 +11,6 @@ public static class EducationalAchievementFile
     public static string LastNameColumn { get; } = "Last Name";
 
     public static string GradePercentColumn { get; } = "Grade percent";
+
+    public static int AllowedNumberOfErrorRows { get; } = 50;
 }

@@ -133,8 +133,18 @@
         OnSecondContainerDragleave();
         try
         {
-            this.students = this.dataHandler.GetResultWithExplicitProctoringStatus();
-            Successfully("Обработка данных завершена корректно");
+            var (studentsData, studentsWithoutProctorinsStatus)
+                = this.dataHandler.GetResultWithExplicitProctoringStatus();
+            this.students = studentsData;
+            if (studentsWithoutProctorinsStatus.Count > 0)
+            {
+                Unsuccessfully(ErrorMessages.GenerateFilesProcessingErrorMessageWithStudentEmails(
+                    studentsWithoutProctorinsStatus));
+            }
+            else
+            {
+                Successfully("Обработка данных завершена корректно");
+            }
         }
         catch (InvalidInputDataException invalidInputDataException)
         {

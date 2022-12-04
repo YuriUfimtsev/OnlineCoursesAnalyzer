@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using OnlineCoursesAnalyzer.Data;
+﻿using OnlineCoursesAnalyzer.Data;
 
 namespace OnlineCoursesAnalyzer.DataHandling;
 
@@ -21,55 +20,85 @@ public class DataHandler
     };
 
     private Dictionary<string, Student>? educationalAchievementData;
-    private Dictionary<string, string>? proctoringStatusData;
+    private Dictionary<string, bool>? proctoringStatusData;
     private List<(Student, bool)>? studentsDataWithExplicitProctoringStatus;
     private bool isNotNullDataActual;
 
-    public void AddEducationalAchievementData(Stream fileReadStream)
+    public List<string> AddEducationalAchievementData(Stream fileReadStream)
     {
-        var educationalAchievmentDataList = XLXSParser.GetDataFromColumnsWithoutFirstRow(
+        var (educationalAchievmentDataList, errorRows) = XLXSParser.GetDataWithoutFirstRow(
             fileReadStream, RequiredDataFromEducationalAchievementFile);
         var educationalAchievmentDataDictionary = new Dictionary<string, Student>();
-        foreach (var studentData in educationalAchievmentDataList)
+        foreach (var rowData in educationalAchievmentDataList)
         {
-            var grade = Grade.GetGrade(studentData[4]);
-            var student = new Student(studentData[1], studentData[2], studentData[3], grade.ToString());
-            educationalAchievmentDataDictionary.Add(studentData[0], student);
+            try
+            {
+                var grade = Grade.GetGrade(rowData[4]);
+                var student = new Student(rowData[1], rowData[2], rowData[3], grade.ToString());
+                educationalAchievmentDataDictionary.Add(rowData[0], student);
+            }
+            catch (FormatException)
+            {
+                errorRows.Add(rowData[rowData.Length - 1]);
+            }
+            catch (ArgumentException)
+            {
+                throw new InvalidInputDataException(
+                    ErrorMessages.GenerateRepeatStudentErrorMessage(rowData[0]));
+            }
+
+            if (errorRows.Count > EducationalAchievementFile.AllowedNumberOfErrorRows)
+            {
+                throw new InvalidInputDataException(
+                    ErrorMessages.GenerateFileUploadErrorMessageWithInvalidRows(errorRows));
+            }
         }
 
         this.educationalAchievementData = educationalAchievmentDataDictionary;
         this.isNotNullDataActual = false;
+        return errorRows;
     }
 
-    public void AddProctoringStatusData(Stream fileReadStream)
+    public List<string> AddProctoringStatusData(Stream fileReadStream)
     {
-        var proctoringStatusDataList = XLXSParser.GetDataFromColumnsWithoutFirstRow(
+        var (proctoringStatusDataList, errorRows) = XLXSParser.GetDataWithoutFirstRow(
             fileReadStream, RequiredDataFromProctoringStatusFile);
-        var proctoringStatusDataDictionary = new Dictionary<string, string>();
+        var proctoringStatusDataDictionary = new Dictionary<string, bool>();
         foreach (var studentData in proctoringStatusDataList)
         {
-            proctoringStatusDataDictionary.Add(studentData[0], studentData[1]);
+            var (isProctoringDataCorrect, proctoringData) = InterpretProctoringStatus(studentData[1]);
+            if (!isProctoringDataCorrect)
+            {
+                errorRows.Add(studentData[studentData.Length - 1]);
+                if (errorRows.Count > ProctoringStatusFile.AllowedNumberOfErrorRows)
+                {
+                    throw new InvalidInputDataException(
+                        ErrorMessages.GenerateFileUploadErrorMessageWithInvalidRows(errorRows));
+                }
+            }
+            else
+            {
+                proctoringStatusDataDictionary.Add(studentData[0], proctoringData);
+            }
         }
 
         this.proctoringStatusData = proctoringStatusDataDictionary;
         this.isNotNullDataActual = false;
+        return errorRows;
     }
 
-    public List<(Student, bool)>? GetResultWithExplicitProctoringStatus()
+    public (List<(Student Student, bool IsProctoringCorrect)> StudentsData,
+        List<string> StudentsWithoutProctoringEmails) GetResultWithExplicitProctoringStatus()
     {
+        var studentWithoutProctoringEmails = new List<string>();
         if (this.isNotNullDataActual)
         {
-            return this.studentsDataWithExplicitProctoringStatus;
+            return (this.studentsDataWithExplicitProctoringStatus!, studentWithoutProctoringEmails);
         }
 
         if (this.educationalAchievementData == null || this.proctoringStatusData == null)
         {
-            return null;
-        }
-
-        if (this.educationalAchievementData.Count != this.proctoringStatusData.Count)
-        {
-            // do smth
+            throw new InvalidInputDataException(ErrorMessages.NotEnoughData);
         }
 
         var studentsData = new List<(Student, bool)>();
@@ -77,11 +106,22 @@ public class DataHandler
         {
             if (this.proctoringStatusData.ContainsKey(student.Key))
             {
-                student.Value.ProctoringStatus = this.proctoringStatusData[student.Key];
+                student.Value.ProctoringStatus = this.proctoringStatusData[student.Key]
+                    ? ProctoringStatusFile.ProctoringStatusIsTrue : ProctoringStatusFile.ProctoringStatusIsFalse; ////
+            }
+            else
+            {
+                studentWithoutProctoringEmails.Add(student.Key);
+                if (studentWithoutProctoringEmails.Count
+                    > ErrorMessages.AllowedNumberOfStudentsWithoutProctoringStatus)
+                {
+                    throw new InvalidInputDataException(
+                        ErrorMessages.GenerateFilesProcessingErrorMessageWithStudentEmails(
+                            studentWithoutProctoringEmails));
+                }
             }
 
-            var proctoringData = InterpretProctoringStatus(student.Value);
-            studentsData.Add((student.Value, proctoringData));
+            studentsData.Add((student.Value, this.proctoringStatusData[student.Key]));
         }
 
         studentsData.Sort((firstElement, secondElement)
@@ -89,22 +129,26 @@ public class DataHandler
         this.studentsDataWithExplicitProctoringStatus = studentsData;
         this.isNotNullDataActual = true;
 
-        return studentsData;
+        if (this.educationalAchievementData.Count < this.proctoringStatusData.Count)
+        {
+            // do smth
+        }
+
+        return (studentsData, studentWithoutProctoringEmails);
     }
 
-    private static bool InterpretProctoringStatus(Student studentData)
+    private static (bool IsInterpretationCorrect, bool InterpretationResult) InterpretProctoringStatus(
+        string proctoringData)
     {
-        if (studentData.ProctoringStatus == ProctoringStatusFile.ProctoringStatusIsTrue)
+        var isInterpretationCorrect = true;
+        var interpretationResult = proctoringData == ProctoringStatusFile.ProctoringStatusIsTrue;
+        if (!interpretationResult && proctoringData == ProctoringStatusFile.ProctoringStatusIsFalse)
         {
-            return true;
-        }
-        else if (studentData.ProctoringStatus == ProctoringStatusFile.ProctoringStatusIsFalse)
-        {
-            return false;
+            return (isInterpretationCorrect, interpretationResult);
         }
         else
         {
-            throw new Exception(); ////
+            return (!isInterpretationCorrect, interpretationResult);
         }
     }
 }

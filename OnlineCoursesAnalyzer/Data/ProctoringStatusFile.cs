@@ -9,4 +9,7 @@ public static class ProctoringStatusFile
     public static string ProctoringStatusIsTrue { get; } = "yes";
 
     public static string ProctoringStatusIsFalse { get; } = "no";
+
+    public static int AllowedNumberOfErrorRows { get; } = 50;
+
 }
