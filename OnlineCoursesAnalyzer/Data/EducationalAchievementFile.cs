@@ -2,13 +2,13 @@
 
 public static class EducationalAchievementFile
 {
-    public const string EmailColumn = "Email";
+    public static string EmailColumn { get; } = "Email";
 
-    public const string SecondNameColumn = "Second Name";
+    public static string SecondNameColumn { get; } = "Second Name";
 
-    public const string FirstNameColumn = "First Name";
+    public static string FirstNameColumn { get; } = "First Name";
 
-    public const string LastNameColumn = "Last Name";
+    public static string LastNameColumn { get; } = "Last Name";
 
-    public const string GradePercentColumn = "Grade percent";
+    public static string GradePercentColumn { get; } = "Grade percent";
 }

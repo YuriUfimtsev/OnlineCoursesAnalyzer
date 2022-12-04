@@ -80,7 +80,7 @@ public class DataHandler
                 student.Value.ProctoringStatus = this.proctoringStatusData[student.Key];
             }
 
-            var proctoringData = InterpretProctoringStatus(student.Value, studentsData.Count);
+            var proctoringData = InterpretProctoringStatus(student.Value);
             studentsData.Add((student.Value, proctoringData));
         }
 
@@ -92,13 +92,19 @@ public class DataHandler
         return studentsData;
     }
 
-    private static bool InterpretProctoringStatus(Student studentData, int count)
+    private static bool InterpretProctoringStatus(Student studentData)
     {
-        return studentData.ProctoringStatus switch
+        if (studentData.ProctoringStatus == ProctoringStatusFile.ProctoringStatusIsTrue)
         {
-            ProctoringStatusFile.ProctoringStatusIsTrue => true,
-            ProctoringStatusFile.ProctoringStatusIsFalse => false,
-            _ => throw new Exception(), ////
-        };
+            return true;
+        }
+        else if (studentData.ProctoringStatus == ProctoringStatusFile.ProctoringStatusIsFalse)
+        {
+            return false;
+        }
+        else
+        {
+            throw new Exception(); ////
+        }
     }
 }

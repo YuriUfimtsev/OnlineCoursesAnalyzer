@@ -2,11 +2,11 @@
 
 public static class ProctoringStatusFile
 {
-    public const string EmailColumn = "User";
+    public static string EmailColumn { get; } = "User";
 
-    public const string ProctoringStatusColumn = "Status is correct";
+    public static string ProctoringStatusColumn { get; } = "Status is correct";
 
-    public const string ProctoringStatusIsTrue = "yes";
+    public static string ProctoringStatusIsTrue { get; } = "yes";
 
-    public const string ProctoringStatusIsFalse = "no";
+    public static string ProctoringStatusIsFalse { get; } = "no";
 }
