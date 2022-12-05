@@ -14,6 +14,8 @@ public static class EducationalAchievementFile
 
     public static int AllowedNumberOfErrorRows { get; } = 50;
 
-    public static int AllowedNumberOfStudentsWithoutProctoringStatus { get; } = 20;
+    public static int AllowedNumberOfStudentsWithoutProctoringStatus { get; } = 50;
 
+    // 2 megabytes
+    public static int MaxAllowedSizeInBytes { get; } = 2097152;
 }

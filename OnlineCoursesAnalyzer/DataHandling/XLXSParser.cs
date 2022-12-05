@@ -8,7 +8,7 @@ public static class XLXSParser
         Stream stream,
         string[] requiredColumnNames)
     {
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial; ////
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
         var nullRowsNumbers = new List<string>();
         var dataWithRowsNumbers = new List<string[]>();
@@ -17,6 +17,8 @@ public static class XLXSParser
             using var package = new ExcelPackage(stream);
             var worksheet = package.Workbook.Worksheets[0];
             var requiredColumnNumbers = GetColumnNumbersFromNames(worksheet, requiredColumnNames);
+            var nullRowsSubsequenceLength = 0;
+            var firstRowNumberInNullRowSubsequence = 0;
             for (var i = 2; i < worksheet.Dimension.Rows; ++i)
             {
                 var (rowDataAndNumber, isNullRow) = GetRowData(worksheet, i, requiredColumnNumbers);
@@ -26,11 +28,26 @@ public static class XLXSParser
                 }
                 else
                 {
-                    nullRowsNumbers.Add(i.ToString());
-                    if (nullRowsNumbers.Count > EducationalAchievementFile.AllowedNumberOfErrorRows)
+                    if ((firstRowNumberInNullRowSubsequence + nullRowsSubsequenceLength) == i)
                     {
-                        throw new InvalidInputDataException(
-                            ErrorMessages.GenerateFileUploadErrorMessageWithInvalidRows(nullRowsNumbers));
+                        nullRowsSubsequenceLength++;
+                    }
+                    else
+                    {
+                        for (var j = firstRowNumberInNullRowSubsequence;
+                            j < firstRowNumberInNullRowSubsequence + nullRowsSubsequenceLength;
+                            ++j)
+                        {
+                            nullRowsNumbers.Add(i.ToString());
+                            if (nullRowsNumbers.Count > EducationalAchievementFile.AllowedNumberOfErrorRows)
+                            {
+                                throw new InvalidInputDataException(
+                                    Messages.GenerateFileUploadErrorMessageWithInvalidRows(nullRowsNumbers));
+                            }
+                        }
+
+                        firstRowNumberInNullRowSubsequence = i;
+                        nullRowsSubsequenceLength = 1;
                     }
                 }
             }
@@ -39,7 +56,7 @@ public static class XLXSParser
         }
         catch (InvalidDataException)
         {
-            throw new InvalidInputDataException(ErrorMessages.IncorrectFileType);
+            throw new InvalidInputDataException(Messages.IncorrectFileType);
         }
     }
 
@@ -60,7 +77,7 @@ public static class XLXSParser
             catch (InvalidOperationException)
             {
                 throw new InvalidInputDataException(
-                    ErrorMessages.GenerateRequiredColumnNameNotFoundErrorMessage(requiredColumnNames[i]));
+                    Messages.GenerateRequiredColumnNameNotFoundErrorMessage(requiredColumnNames[i]));
             }
         }
 

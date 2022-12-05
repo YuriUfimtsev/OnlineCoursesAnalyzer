@@ -24,6 +24,14 @@ public class DataHandler
     private List<(Student, bool)>? studentsDataWithExplicitProctoringStatus;
     private bool isNotNullDataActual;
 
+    public bool ISProctoringDataMoreThanEducationalAchievmentData
+    {
+        get
+        {
+            return this.educationalAchievementData == null || this.proctoringStatusData == null ? false : this.proctoringStatusData!.Count > this.educationalAchievementData!.Count;
+        }
+    }
+
     public List<string> AddEducationalAchievementData(Stream fileReadStream)
     {
         var (educationalAchievmentDataList, errorRows) = XLXSParser.GetDataWithoutFirstRow(
@@ -44,18 +52,20 @@ public class DataHandler
             catch (ArgumentException)
             {
                 throw new InvalidInputDataException(
-                    ErrorMessages.GenerateRepeatStudentErrorMessage(rowData[0]));
+                    Messages.GenerateRepeatStudentErrorMessage(rowData[0]));
             }
 
             if (errorRows.Count > EducationalAchievementFile.AllowedNumberOfErrorRows)
             {
                 throw new InvalidInputDataException(
-                    ErrorMessages.GenerateFileUploadErrorMessageWithInvalidRows(errorRows));
+                    Messages.GenerateFileUploadErrorMessageWithInvalidRows(errorRows));
             }
         }
 
         this.educationalAchievementData = educationalAchievmentDataDictionary;
         this.isNotNullDataActual = false;
+
+        // errorRows.Sort();
         return errorRows;
     }
 
@@ -73,7 +83,7 @@ public class DataHandler
                 if (errorRows.Count > ProctoringStatusFile.AllowedNumberOfErrorRows)
                 {
                     throw new InvalidInputDataException(
-                        ErrorMessages.GenerateFileUploadErrorMessageWithInvalidRows(errorRows));
+                        Messages.GenerateFileUploadErrorMessageWithInvalidRows(errorRows));
                 }
             }
             else
@@ -84,6 +94,8 @@ public class DataHandler
 
         this.proctoringStatusData = proctoringStatusDataDictionary;
         this.isNotNullDataActual = false;
+
+        // errorRows.Sort();
         return errorRows;
     }
 
@@ -98,7 +110,7 @@ public class DataHandler
 
         if (this.educationalAchievementData == null || this.proctoringStatusData == null)
         {
-            throw new InvalidInputDataException(ErrorMessages.NotEnoughData);
+            throw new InvalidInputDataException(Messages.NotEnoughData);
         }
 
         var studentsData = new List<(Student, bool)>();
@@ -107,7 +119,8 @@ public class DataHandler
             if (this.proctoringStatusData.ContainsKey(student.Key))
             {
                 student.Value.ProctoringStatus = this.proctoringStatusData[student.Key]
-                    ? ProctoringStatusFile.ProctoringStatusIsTrue : ProctoringStatusFile.ProctoringStatusIsFalse; ////
+                    ? ProctoringStatusFile.ProctoringStatusIsTrue : ProctoringStatusFile.ProctoringStatusIsFalse;
+                studentsData.Add((student.Value, this.proctoringStatusData[student.Key]));
             }
             else
             {
@@ -116,12 +129,10 @@ public class DataHandler
                     > EducationalAchievementFile.AllowedNumberOfStudentsWithoutProctoringStatus)
                 {
                     throw new InvalidInputDataException(
-                        ErrorMessages.GenerateFilesProcessingErrorMessageWithStudentEmails(
+                        Messages.GenerateFilesProcessingErrorMessageWithStudentEmails(
                             studentWithoutProctoringEmails));
                 }
             }
-
-            studentsData.Add((student.Value, this.proctoringStatusData[student.Key]));
         }
 
         studentsData.Sort((firstElement, secondElement)
@@ -129,11 +140,12 @@ public class DataHandler
         this.studentsDataWithExplicitProctoringStatus = studentsData;
         this.isNotNullDataActual = true;
 
-        if (this.educationalAchievementData.Count < this.proctoringStatusData.Count)
-        {
-            // do smth
-        }
+        // if (this.educationalAchievementData.Count < this.proctoringStatusData.Count)
+        // {
+        //    ErrorMessages.MoreProctoringDataThanEducationalAchievmentData;
+        // }
 
+        // studentWithoutProctoringEmails.Sort();
         return (studentsData, studentWithoutProctoringEmails);
     }
 
@@ -142,7 +154,7 @@ public class DataHandler
     {
         var isInterpretationCorrect = true;
         var interpretationResult = proctoringData == ProctoringStatusFile.ProctoringStatusIsTrue;
-        if (!interpretationResult && proctoringData == ProctoringStatusFile.ProctoringStatusIsFalse)
+        if (interpretationResult || (!interpretationResult && proctoringData == ProctoringStatusFile.ProctoringStatusIsFalse))
         {
             return (isInterpretationCorrect, interpretationResult);
         }

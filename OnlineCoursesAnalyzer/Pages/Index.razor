@@ -102,6 +102,13 @@
         this.message = message;
     }
 
+    private void Warning(string message)
+    {
+        this.validationClass = "alert-warning";
+        this.message = message;
+    }
+
+
     private void Unsuccessfully(string message)
     {
         this.validationClass = "alert-danger";
@@ -127,7 +134,7 @@
 
     private async Task GetResult()
     {
-        Standart("Обработка данных");
+        Standart(Messages.InProcess);
         await Task.Delay(1);
         OnFirstContainerDragleave();
         OnSecondContainerDragleave();
@@ -138,12 +145,26 @@
             this.students = studentsData;
             if (studentsWithoutProctorinsStatus.Count > 0)
             {
-                Unsuccessfully(ErrorMessages.GenerateFilesProcessingErrorMessageWithStudentEmails(
-                    studentsWithoutProctorinsStatus));
+                if (this.dataHandler.ISProctoringDataMoreThanEducationalAchievmentData)
+                {
+                    Warning(Messages.GenerateComplexMessage(
+                        Messages.MoreProctoringDataThanEducationalAchievmentData,
+                        Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(
+                            studentsWithoutProctorinsStatus)));
+                }
+                else
+                {
+                    Warning(Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(
+                        studentsWithoutProctorinsStatus));
+                }
+            }
+            else if (this.dataHandler.ISProctoringDataMoreThanEducationalAchievmentData)
+            {
+                Warning(Messages.MoreProctoringDataThanEducationalAchievmentData);
             }
             else
             {
-                Successfully("Обработка данных завершена корректно");
+                Successfully(Messages.ProcessingCompletedSuccessfully);
             }
         }
         catch (InvalidInputDataException invalidInputDataException)
@@ -172,21 +193,25 @@
 
         var file = eventArgs.File;
         using var memoryStream = new MemoryStream();
-        Standart($"Файл '{file.Name}' загружается");
-        await file.OpenReadStream().CopyToAsync(memoryStream);
+        Standart(Messages.GenerateFileInProcessUploadMessage(file.Name));
+        await file.OpenReadStream(fileType == FileType.EducationalAchievementData
+            ? EducationalAchievementFile.MaxAllowedSizeInBytes
+            : ProctoringStatusFile.MaxAllowedSizeInBytes)
+                .CopyToAsync(memoryStream);
         try
         {
-            switch (fileType)
+            var errorRows = fileType == FileType.EducationalAchievementData
+                ? this.dataHandler.AddEducationalAchievementData(memoryStream)
+                    : this.dataHandler.AddProctoringStatusData(memoryStream);
+            if (errorRows.Count > 0)
             {
-                case FileType.EducationalAchievementData:
-                    this.dataHandler.AddEducationalAchievementData(memoryStream);
-                    break;
-                case FileType.ProctoringStatusData:
-                    this.dataHandler.AddProctoringStatusData(memoryStream);
-                    break;
+                Warning(Messages.GenerateFileUploadWarningMessageWithInvalidRows(errorRows));
+            }
+            else
+            {
+                Successfully(Messages.GenerateFileSuccessfullyUploadMessage(file.Name));
             }
 
-            Successfully($"Файл '{file.Name}' успешно загружен");
             ShowAddedFileName(file.Name, fileType);
         }
         catch (InvalidInputDataException invalidInputDataException)
