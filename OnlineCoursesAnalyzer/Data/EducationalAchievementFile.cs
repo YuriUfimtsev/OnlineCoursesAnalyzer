@@ -13,4 +13,7 @@ public static class EducationalAchievementFile
     public static string GradePercentColumn { get; } = "Grade percent";
 
     public static int AllowedNumberOfErrorRows { get; } = 50;
+
+    public static int AllowedNumberOfStudentsWithoutProctoringStatus { get; } = 20;
+
 }

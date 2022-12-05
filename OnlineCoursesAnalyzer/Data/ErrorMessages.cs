@@ -2,13 +2,11 @@
 
 namespace OnlineCoursesAnalyzer.Data;
 
-public class ErrorMessages
+public static class ErrorMessages
 {
     private static int numberOfRowNumbersDisplayed = 20;
 
     private static int numberOfStudentEmailsDisplayed = 5;
-
-    public static int AllowedNumberOfStudentsWithoutProctoringStatus { get; } = 20;
 
     public static string IncorrectFileType { get; } = "Тип файла не соответствует .xlxs";
 

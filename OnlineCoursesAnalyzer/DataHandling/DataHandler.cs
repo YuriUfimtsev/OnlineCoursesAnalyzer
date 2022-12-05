@@ -113,7 +113,7 @@ public class DataHandler
             {
                 studentWithoutProctoringEmails.Add(student.Key);
                 if (studentWithoutProctoringEmails.Count
-                    > ErrorMessages.AllowedNumberOfStudentsWithoutProctoringStatus)
+                    > EducationalAchievementFile.AllowedNumberOfStudentsWithoutProctoringStatus)
                 {
                     throw new InvalidInputDataException(
                         ErrorMessages.GenerateFilesProcessingErrorMessageWithStudentEmails(
