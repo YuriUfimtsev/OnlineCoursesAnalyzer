@@ -35,8 +35,10 @@ public class DataHandler
 
     public List<string> AddEducationalAchievementData(Stream fileReadStream)
     {
-        var (educationalAchievmentDataList, errorRows) = XLXSParser.GetDataWithoutFirstRow(
-            fileReadStream, RequiredDataFromEducationalAchievementFile);
+        var (educationalAchievmentDataList, errorRows) = XLSXParser.GetDataWithoutFirstRow(
+            fileReadStream,
+            RequiredDataFromEducationalAchievementFile,
+            EducationalAchievementFile.AllowedNumberOfErrorRows);
         var educationalAchievmentDataDictionary = new Dictionary<string, Student>();
         foreach (var rowData in educationalAchievmentDataList)
         {
@@ -70,8 +72,10 @@ public class DataHandler
 
     public List<string> AddProctoringStatusData(Stream fileReadStream)
     {
-        var (proctoringStatusDataList, errorRows) = XLXSParser.GetDataWithoutFirstRow(
-            fileReadStream, RequiredDataFromProctoringStatusFile);
+        var (proctoringStatusDataList, errorRows) = XLSXParser.GetDataWithoutFirstRow(
+            fileReadStream,
+            RequiredDataFromProctoringStatusFile,
+            ProctoringStatusFile.AllowedNumberOfErrorRows);
         var proctoringStatusDataDictionary = new Dictionary<string, bool>();
         foreach (var studentData in proctoringStatusDataList)
         {
