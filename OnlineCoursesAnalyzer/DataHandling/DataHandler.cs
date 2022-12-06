@@ -28,7 +28,8 @@ public class DataHandler
     {
         get
         {
-            return this.educationalAchievementData == null || this.proctoringStatusData == null ? false : this.proctoringStatusData!.Count > this.educationalAchievementData!.Count;
+            return this.educationalAchievementData == null || this.proctoringStatusData == null ? false
+                : this.proctoringStatusData!.Count > this.educationalAchievementData!.Count;
         }
     }
 
@@ -64,8 +65,6 @@ public class DataHandler
 
         this.educationalAchievementData = educationalAchievmentDataDictionary;
         this.isNotNullDataActual = false;
-
-        // errorRows.Sort();
         return errorRows;
     }
 
@@ -94,8 +93,6 @@ public class DataHandler
 
         this.proctoringStatusData = proctoringStatusDataDictionary;
         this.isNotNullDataActual = false;
-
-        // errorRows.Sort();
         return errorRows;
     }
 
@@ -139,13 +136,6 @@ public class DataHandler
             => firstElement.Item1.SecondName.CompareTo(secondElement.Item1.SecondName));
         this.studentsDataWithExplicitProctoringStatus = studentsData;
         this.isNotNullDataActual = true;
-
-        // if (this.educationalAchievementData.Count < this.proctoringStatusData.Count)
-        // {
-        //    ErrorMessages.MoreProctoringDataThanEducationalAchievmentData;
-        // }
-
-        // studentWithoutProctoringEmails.Sort();
         return (studentsData, studentWithoutProctoringEmails);
     }
 

@@ -88,6 +88,12 @@
         this.validationClass = "standart";
     }
 
+    public enum FileType
+    {
+        EducationalAchievementData,
+        ProctoringStatusData,
+    }
+
     private void OnFirstContainerDragover() => this.firstContainerHoverClass = "hover";
 
     private void OnSecondContainerDragover() => this.secondContainerHoverClass = "hover";
@@ -134,42 +140,42 @@
 
     private async Task GetResult()
     {
-        Standart(Messages.InProcess);
+        this.Standart(Messages.InProcess);
         await Task.Delay(1);
-        OnFirstContainerDragleave();
-        OnSecondContainerDragleave();
+        this.OnFirstContainerDragleave();
+        this.OnSecondContainerDragleave();
         try
         {
-            var (studentsData, studentsWithoutProctorinsStatus)
+            var (studentsData, studentsWithoutProctoringStatus)
                 = this.dataHandler.GetResultWithExplicitProctoringStatus();
             this.students = studentsData;
-            if (studentsWithoutProctorinsStatus.Count > 0)
+            if (studentsWithoutProctoringStatus.Count > 0)
             {
                 if (this.dataHandler.ISProctoringDataMoreThanEducationalAchievmentData)
                 {
-                    Warning(Messages.GenerateComplexMessage(
+                    this.Warning(Messages.GenerateComplexMessage(
                         Messages.MoreProctoringDataThanEducationalAchievmentData,
                         Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(
-                            studentsWithoutProctorinsStatus)));
+                            studentsWithoutProctoringStatus)));
                 }
                 else
                 {
-                    Warning(Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(
-                        studentsWithoutProctorinsStatus));
+                    this.Warning(Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(
+                        studentsWithoutProctoringStatus));
                 }
             }
             else if (this.dataHandler.ISProctoringDataMoreThanEducationalAchievmentData)
             {
-                Warning(Messages.MoreProctoringDataThanEducationalAchievmentData);
+                this.Warning(Messages.MoreProctoringDataThanEducationalAchievmentData);
             }
             else
             {
-                Successfully(Messages.ProcessingCompletedSuccessfully);
+                this.Successfully(Messages.ProcessingCompletedSuccessfully);
             }
         }
         catch (InvalidInputDataException invalidInputDataException)
         {
-            Unsuccessfully(invalidInputDataException.Message);
+            this.Unsuccessfully(invalidInputDataException.Message);
         }
     }
 
@@ -193,7 +199,7 @@
 
         var file = eventArgs.File;
         using var memoryStream = new MemoryStream();
-        Standart(Messages.GenerateFileInProcessUploadMessage(file.Name));
+        this.Standart(Messages.GenerateFileInProcessUploadMessage(file.Name));
         await file.OpenReadStream(fileType == FileType.EducationalAchievementData
             ? EducationalAchievementFile.MaxAllowedSizeInBytes
             : ProctoringStatusFile.MaxAllowedSizeInBytes)
@@ -205,24 +211,18 @@
                     : this.dataHandler.AddProctoringStatusData(memoryStream);
             if (errorRows.Count > 0)
             {
-                Warning(Messages.GenerateFileUploadWarningMessageWithInvalidRows(errorRows));
+                this.Warning(Messages.GenerateFileUploadWarningMessageWithInvalidRows(errorRows));
             }
             else
             {
-                Successfully(Messages.GenerateFileSuccessfullyUploadMessage(file.Name));
+                this.Successfully(Messages.GenerateFileSuccessfullyUploadMessage(file.Name));
             }
 
-            ShowAddedFileName(file.Name, fileType);
+            this.ShowAddedFileName(file.Name, fileType);
         }
         catch (InvalidInputDataException invalidInputDataException)
         {
-            Unsuccessfully(invalidInputDataException.Message);
+            this.Unsuccessfully(invalidInputDataException.Message);
         }
-    }
-
-    private enum FileType
-    {
-        EducationalAchievementData,
-        ProctoringStatusData,
     }
 }
