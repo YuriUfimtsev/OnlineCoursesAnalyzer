@@ -8,15 +8,12 @@ namespace OnlineCoursesAnalyzerTests;
 
 public class XLSXParserTests
 {
-    public static string GetPathToFile(string xlxsFileNameWithoutExtension)
-        => $"../../../Data/{xlxsFileNameWithoutExtension}";
-
+    private static string GetPathToFile(string fileName)
+        => $"../../../Data/{fileName}";
 
     [Test]
     public void StandartTest()
     {
-        Console.WriteLine(TestContext.CurrentContext.TestDirectory);
-        Console.WriteLine(TestContext.CurrentContext.WorkDirectory);
         var stream = File.OpenRead(GetPathToFile("1.xlsx"));
         var requiredColumnNames = new [] { "Фамилия", "Имя", "Город" };
         var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataWithoutFirstRow(stream, requiredColumnNames, 0);

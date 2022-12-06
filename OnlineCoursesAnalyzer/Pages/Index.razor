@@ -88,7 +88,7 @@
         this.validationClass = "standart";
     }
 
-    public enum FileType
+    private enum FileType
     {
         EducationalAchievementData,
         ProctoringStatusData,
@@ -151,7 +151,7 @@
             this.students = studentsData;
             if (studentsWithoutProctoringStatus.Count > 0)
             {
-                if (this.dataHandler.ISProctoringDataMoreThanEducationalAchievmentData)
+                if (this.dataHandler.IsNotNullProctoringDataMoreThanNotNullEducationalAchievmentData)
                 {
                     this.Warning(Messages.GenerateComplexMessage(
                         Messages.MoreProctoringDataThanEducationalAchievmentData,
@@ -164,7 +164,7 @@
                         studentsWithoutProctoringStatus));
                 }
             }
-            else if (this.dataHandler.ISProctoringDataMoreThanEducationalAchievmentData)
+            else if (this.dataHandler.IsNotNullProctoringDataMoreThanNotNullEducationalAchievmentData)
             {
                 this.Warning(Messages.MoreProctoringDataThanEducationalAchievmentData);
             }
