@@ -15,7 +15,6 @@ h3 {
 
 h6 {
     padding-top: 5px;
-    font-weight: bold;
 }
 
 .standart {
@@ -23,7 +22,7 @@ h6 {
 }
 
 .outstanding {
-    background-color: #F8173E;
+    background-color: #f8173e;
 }
 
 .modal-body {
