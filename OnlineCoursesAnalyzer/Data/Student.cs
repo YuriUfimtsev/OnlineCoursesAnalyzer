@@ -2,14 +2,6 @@
 
 public class Student
 {
-    public Student(string secondName, string firstName, string lastName, string grade)
-    {
-        this.SecondName = secondName;
-        this.FirstName = firstName;
-        this.LastName = lastName;
-        this.Grade = grade;
-    }
-
     public Student(string secondName, string firstName, string lastName, string grade, string proctoringStatus)
     {
         this.SecondName = secondName;
@@ -17,6 +9,11 @@ public class Student
         this.LastName = lastName;
         this.Grade = grade;
         this.ProctoringStatus = proctoringStatus;
+    }
+
+    public Student(string secondName, string firstName, string lastName, string grade)
+        : this(secondName, firstName, lastName, grade, string.Empty)
+    {
     }
 
     public string SecondName { get; }
@@ -27,5 +24,5 @@ public class Student
 
     public string Grade { get; }
 
-    public string? ProctoringStatus { get; set; }
+    public string ProctoringStatus { get; set; }
 }

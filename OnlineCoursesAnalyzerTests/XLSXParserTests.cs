@@ -9,7 +9,7 @@ namespace OnlineCoursesAnalyzerTests;
 public class XLSXParserTests
 {
     private static string GetPathToFile(string fileName)
-        => $"../../../Data/{fileName}";
+        => $"Data/{fileName}";
 
     [Test]
     public void StandartTest()

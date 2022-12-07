@@ -23,7 +23,12 @@ h6 {
 }
 
 .outstanding {
-    background-color: #b32121;
+    background-color: #F8173E;
+}
+
+.modal-body {
+    align-items: flex-end;
+    text-align: left;
 }
 
 a,
@@ -63,6 +68,7 @@ body {
     height: 100%;
     margin: 0;
     overflow-wrap: break-word;
+    cursor: default;
 }
 
     .alert.standart {

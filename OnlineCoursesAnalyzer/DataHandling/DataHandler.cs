@@ -30,8 +30,8 @@ public class DataHandler
     {
         get
         {
-            return this.EducationalAchievementData == null || this.ProctoringStatusData == null ? false
-                : this.ProctoringStatusData!.Count > this.EducationalAchievementData!.Count;
+            return this.EducationalAchievementData == null || this.ProctoringStatusData == null
+                ? false : this.ProctoringStatusData!.Count > this.EducationalAchievementData!.Count;
         }
     }
 
@@ -56,13 +56,13 @@ public class DataHandler
             }
             catch (ArgumentException)
             {
-                throw new InvalidInputDataException(
-                    Messages.GenerateRepeatStudentErrorMessage(rowData[0]));
+                throw new InvalidInputDataException(Messages.GenerateRepeatStudentErrorMessage(rowData[0]));
             }
 
             if (errorRows.Count > EducationalAchievementFile.AllowedNumberOfErrorRows)
             {
                 throw new InvalidInputDataException(
+                    Messages.GenerateFileUploadErrorMessage(errorRows.Count),
                     Messages.GenerateFileUploadErrorMessageWithInvalidRows(errorRows));
             }
         }
@@ -88,6 +88,7 @@ public class DataHandler
                 if (errorRows.Count > ProctoringStatusFile.AllowedNumberOfErrorRows)
                 {
                     throw new InvalidInputDataException(
+                        Messages.GenerateFileUploadErrorMessage(errorRows.Count),
                         Messages.GenerateFileUploadErrorMessageWithInvalidRows(errorRows));
                 }
             }
@@ -137,8 +138,8 @@ public class DataHandler
                     > EducationalAchievementFile.AllowedNumberOfStudentsWithoutProctoringStatus)
                 {
                     throw new InvalidInputDataException(
-                        Messages.GenerateFilesProcessingErrorMessageWithStudentEmails(
-                            studentWithoutProctoringEmails));
+                        Messages.GenerateFilesProcessingErrorMessage(studentWithoutProctoringEmails.Count),
+                        Messages.GenerateFilesProcessingErrorMessageWithStudentEmails(studentWithoutProctoringEmails));
                 }
             }
         }

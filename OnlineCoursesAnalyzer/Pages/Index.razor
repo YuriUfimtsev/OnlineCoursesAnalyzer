@@ -1,10 +1,13 @@
 ﻿@page "/"
 @inject HttpClient Http
-@using OnlineCoursesAnalyzer.Templates;
 @using OnlineCoursesAnalyzer.Data;
 @using OnlineCoursesAnalyzer.DataHandling;
+@using OnlineCoursesAnalyzer.Components;
+
+<Modal Header="@operationStatus" HeaderStyle="@validationClass" Text="@externalMessage" @ref="modal"></Modal>
 
 <PageTitle>OnlineCoursesAnalyzer</PageTitle>
+
 <div class="container">
     <div class="row">
         <div class="col-6 d-grid">
@@ -44,7 +47,7 @@
         </div>
         <div class="col-9">
             <div class="alert @validationClass" role="alert">
-                @message
+                <span @onclick="() => modal!.Open()">@message</span>
             </div>
         </div>
     </div>
@@ -70,14 +73,18 @@
 </div>
 
 @code {
+    private Modal? modal;
+    private DataHandler dataHandler;
     private List<(Student, bool)>? students;
+
+    private string message;
+    private string externalMessage;
+    private string operationStatus;
+    private string validationClass;
     private string firstContainerHoverClass;
     private string secondContainerHoverClass;
-    private string validationClass;
-    private string? message;
-    private string? educationalAchievementDataFileName;
-    private string? proctoringStatusDataFileName;
-    private DataHandler dataHandler;
+    private string educationalAchievementDataFileName;
+    private string proctoringStatusDataFileName;
 
     public Index()
     {
@@ -85,7 +92,12 @@
         this.dataHandler = new DataHandler();
         this.firstContainerHoverClass = string.Empty;
         this.secondContainerHoverClass = string.Empty;
+        this.message = string.Empty;
+        this.operationStatus = string.Empty;
         this.validationClass = "standart";
+        this.proctoringStatusDataFileName = string.Empty; 
+        this.educationalAchievementDataFileName = string.Empty;
+        this.externalMessage = string.Empty;
     }
 
     private enum FileType
@@ -102,29 +114,37 @@
 
     private void OnSecondContainerDragleave() => this.secondContainerHoverClass = string.Empty;
 
-    private void Successfully(string message)
+    private void Successfully(string message, string externalMessage)
     {
         this.validationClass = "alert-success";
+        this.operationStatus = "Выполнено";
         this.message = message;
+        this.externalMessage = externalMessage;
     }
 
-    private void Warning(string message)
+    private void WithWarning(string message, string externalMessage)
     {
         this.validationClass = "alert-warning";
+        this.operationStatus = "Выполнено";
         this.message = message;
+        this.externalMessage = externalMessage;
     }
 
 
-    private void Unsuccessfully(string message)
+    private void Unsuccessfully(string message, string externalMessage)
     {
         this.validationClass = "alert-danger";
+        this.operationStatus = "Не выполнено";
         this.message = message;
+        this.externalMessage = externalMessage;
     }
 
-    private void Standart(string message)
+    private void Standart(string message, string externalMessage)
     {
         this.validationClass = "standart";
+        this.operationStatus = "В ожидании";
         this.message = message;
+        this.externalMessage = externalMessage;
     }
 
     private void ShowAddedFileName(string fileName, FileType fileType)
@@ -140,7 +160,7 @@
 
     private async Task GetResult()
     {
-        this.Standart(Messages.InProcess);
+        this.Standart(Messages.InProcess, Messages.InProcess);
         await Task.Delay(1);
         this.OnFirstContainerDragleave();
         this.OnSecondContainerDragleave();
@@ -153,29 +173,35 @@
             {
                 if (this.dataHandler.IsNotNullProctoringDataMoreThanNotNullEducationalAchievmentData)
                 {
-                    this.Warning(Messages.GenerateComplexMessage(
-                        Messages.MoreProctoringDataThanEducationalAchievmentData,
-                        Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(
-                            studentsWithoutProctoringStatus)));
+                    this.WithWarning(
+                        Messages.GenerateComplexMessage(
+                            Messages.MoreProctoringDataThanEducationalAchievmentData,
+                            Messages.GenerateFilesProcessingWarningMessage(studentsWithoutProctoringStatus.Count)),
+                        Messages.GenerateComplexMessage(
+                            Messages.MoreProctoringDataThanEducationalAchievmentData,
+                            Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(studentsWithoutProctoringStatus)));
                 }
                 else
                 {
-                    this.Warning(Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(
-                        studentsWithoutProctoringStatus));
+                    this.WithWarning(
+                        Messages.GenerateFilesProcessingWarningMessage(studentsWithoutProctoringStatus.Count),
+                        Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(studentsWithoutProctoringStatus));
                 }
             }
             else if (this.dataHandler.IsNotNullProctoringDataMoreThanNotNullEducationalAchievmentData)
             {
-                this.Warning(Messages.MoreProctoringDataThanEducationalAchievmentData);
+                this.WithWarning(
+                    Messages.MoreProctoringDataThanEducationalAchievmentData,
+                    Messages.MoreProctoringDataThanEducationalAchievmentData);
             }
             else
             {
-                this.Successfully(Messages.ProcessingCompletedSuccessfully);
+                this.Successfully(Messages.ProcessingCompletedSuccessfully, Messages.ProcessingCompletedSuccessfully);
             }
         }
         catch (InvalidInputDataException invalidInputDataException)
         {
-            this.Unsuccessfully(invalidInputDataException.Message);
+            this.Unsuccessfully(invalidInputDataException.Message, invalidInputDataException.ExternalMessage);
         }
     }
 
@@ -199,7 +225,8 @@
 
         var file = eventArgs.File;
         using var memoryStream = new MemoryStream();
-        this.Standart(Messages.GenerateFileInProcessUploadMessage(file.Name));
+        this.Standart(Messages.GenerateFileInProcessUploadMessage(file.Name),
+            Messages.GenerateFileInProcessUploadMessage(file.Name));
         await file.OpenReadStream(fileType == FileType.EducationalAchievementData
             ? EducationalAchievementFile.MaxAllowedSizeInBytes
             : ProctoringStatusFile.MaxAllowedSizeInBytes)
@@ -211,18 +238,20 @@
                     : this.dataHandler.AddProctoringStatusData(memoryStream);
             if (errorRows.Count > 0)
             {
-                this.Warning(Messages.GenerateFileUploadWarningMessageWithInvalidRows(errorRows));
+                this.WithWarning(Messages.GenerateFileUploadWarningMessage(errorRows.Count),
+                    Messages.GenerateFileUploadWarningMessageWithInvalidRows(errorRows));
             }
             else
             {
-                this.Successfully(Messages.GenerateFileSuccessfullyUploadMessage(file.Name));
+                this.Successfully(Messages.GenerateFileSuccessfullyUploadMessage(file.Name),
+                    Messages.GenerateFileSuccessfullyUploadMessage(file.Name));
             }
 
             this.ShowAddedFileName(file.Name, fileType);
         }
         catch (InvalidInputDataException invalidInputDataException)
         {
-            this.Unsuccessfully(invalidInputDataException.Message);
+            this.Unsuccessfully(invalidInputDataException.Message, invalidInputDataException.ExternalMessage);
         }
     }
 }

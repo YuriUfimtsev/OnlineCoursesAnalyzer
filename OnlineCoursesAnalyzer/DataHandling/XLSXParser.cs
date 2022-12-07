@@ -81,6 +81,7 @@ public static class XLSXParser
         if (nullRowsNumbers.Count > allowedNumberOfErrorRows)
         {
             throw new InvalidInputDataException(
+                Messages.GenerateFileUploadErrorMessage(nullRowsNumbers.Count),
                 Messages.GenerateFileUploadErrorMessageWithInvalidRows(nullRowsNumbers));
         }
     }
@@ -101,8 +102,8 @@ public static class XLSXParser
             }
             catch (InvalidOperationException)
             {
-                throw new InvalidInputDataException(
-                    Messages.GenerateRequiredColumnNameNotFoundErrorMessage(requiredColumnNames[i]));
+                throw new InvalidInputDataException(Messages.GenerateRequiredColumnNameNotFoundErrorMessage(
+                    requiredColumnNames[i]));
             }
         }
 

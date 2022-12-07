@@ -7,7 +7,7 @@ namespace OnlineCoursesAnalyzerTests;
 public class DataHandlerTests
 {
     private static string GetPathToFile(string fileName)
-        => $"../../../Data/{fileName}";
+        => $"Data/{fileName}";
 
     private static bool CompareStudents(Student firstStudent, Student secondStudent)
         => firstStudent.SecondName == secondStudent.SecondName
@@ -31,7 +31,8 @@ public class DataHandlerTests
 
         foreach (var keyValuePair in firstDictionary)
         {
-            if (!secondDictionary.ContainsKey(keyValuePair.Key) || !CompareStudents(secondDictionary[keyValuePair.Key], keyValuePair.Value))
+            if (!secondDictionary.ContainsKey(keyValuePair.Key)
+                || !CompareStudents(secondDictionary[keyValuePair.Key], keyValuePair.Value))
             {
                 return false;
             }
@@ -67,7 +68,17 @@ public class DataHandlerTests
         return true;
     }
 
-    [Test]
+    [SetUpFixture]
+    public class GlobalSetup
+    {
+        [OneTimeSetUp]
+        public void RunBeforeAnyTests()
+        {
+            Environment.CurrentDirectory = TestContext.CurrentContext.TestDirectory;
+        }
+    }
+
+        [Test]
     public void GetGradeTest()
     {
         var gradePercentArray = new[] { "90.0", "50", "87.9", "61", "70.3" };
@@ -104,12 +115,6 @@ public class DataHandlerTests
     {
         var dataHandler = new DataHandler();
         var fileStream = File.OpenRead(GetPathToFile("EducationalAchievmentDataWithSomeErrors.xlsx"));
-        if (EducationalAchievementFile.AllowedNumberOfErrorRows < 5)
-        {
-            Assert.Throws<InvalidInputDataException>(() => dataHandler.AddEducationalAchievementData(fileStream));
-            return;
-        }
-
         var expectedErrorRowNumbers = new List<string> { "2", "4", "7", "9", "10" };
         var errorRows = dataHandler.AddEducationalAchievementData(fileStream);
         CollectionAssert.AreEquivalent(expectedErrorRowNumbers, errorRows);
@@ -129,13 +134,6 @@ public class DataHandlerTests
     {
         var dataHandler = new DataHandler();
         var fileStream = File.OpenRead(GetPathToFile("EducationalAchievmentDataWithManyErrorRows.xlsx"));
-        if (EducationalAchievementFile.AllowedNumberOfErrorRows >= 100)
-        {
-            var errorRows = dataHandler.AddEducationalAchievementData(fileStream);
-            Assert.That(errorRows.Count, Is.EqualTo(100));
-            return;
-        }
-
         Assert.Throws<InvalidInputDataException>(() => dataHandler.AddEducationalAchievementData(fileStream));
         Assert.That(dataHandler.EducationalAchievementData, Is.EqualTo(null));
     }
@@ -163,12 +161,6 @@ public class DataHandlerTests
     {
         var dataHandler = new DataHandler();
         var fileStream = File.OpenRead(GetPathToFile("ProctoringStatusDataWithSomeErrors.xlsx"));
-        if (ProctoringStatusFile.AllowedNumberOfErrorRows < 6)
-        {
-            Assert.Throws<InvalidInputDataException>(() => dataHandler.AddProctoringStatusData(fileStream));
-            return;
-        }
-
         var expectedErrorRowNumbers = new List<string> { "4", "5", "6", "8", "9", "10" };
         var errorRows = dataHandler.AddProctoringStatusData(fileStream);
         CollectionAssert.AreEquivalent(expectedErrorRowNumbers, errorRows);
@@ -188,13 +180,6 @@ public class DataHandlerTests
     {
         var dataHandler = new DataHandler();
         var fileStream = File.OpenRead(GetPathToFile("ProctoringStatusDataWithManyErrorRows.xlsx"));
-        if (ProctoringStatusFile.AllowedNumberOfErrorRows >= 100)
-        {
-            var errorRows = dataHandler.AddProctoringStatusData(fileStream);
-            Assert.That(errorRows.Count, Is.EqualTo(100));
-            return;
-        }
-
         Assert.Throws<InvalidInputDataException>(() => dataHandler.AddProctoringStatusData(fileStream));
         Assert.That(dataHandler.ProctoringStatusData, Is.EqualTo(null));
     }
@@ -228,13 +213,6 @@ public class DataHandlerTests
         var proctoringStatusFileStream = File.OpenRead(GetPathToFile("ProctoringStatusDataWithSomeErrors.xlsx"));
         dataHandler.AddEducationalAchievementData(educationalAchievementFileStream);
         dataHandler.AddProctoringStatusData(proctoringStatusFileStream);
-        if (EducationalAchievementFile.AllowedNumberOfStudentsWithoutProctoringStatus
-            < dataHandler.EducationalAchievementData!.Count - dataHandler.ProctoringStatusData!.Count)
-        {
-            Assert.Throws<InvalidInputDataException>(() => dataHandler.GetResultWithExplicitProctoringStatus());
-            return;
-        }
-
         var (studentsData, errorStudents) = dataHandler.GetResultWithExplicitProctoringStatus();
         Assert.That(studentsData.Count, Is.EqualTo(2));
         Assert.That(errorStudents.Count, Is.EqualTo(3));
@@ -248,15 +226,6 @@ public class DataHandlerTests
         var proctoringStatusFileStream = File.OpenRead(GetPathToFile("ProctoringStatusRow.xlsx"));
         dataHandler.AddEducationalAchievementData(educationalAchievementFileStream);
         dataHandler.AddProctoringStatusData(proctoringStatusFileStream);
-        if (EducationalAchievementFile.AllowedNumberOfStudentsWithoutProctoringStatus
-            >= dataHandler.EducationalAchievementData!.Count - dataHandler.ProctoringStatusData!.Count)
-        {
-            var (studentsData, errorStudents) = dataHandler.GetResultWithExplicitProctoringStatus();
-            Assert.That(studentsData.Count, Is.EqualTo(1));
-            Assert.That(errorStudents.Count, Is.EqualTo(100));
-            return;
-        }
-
         Assert.Throws<InvalidInputDataException>(() => dataHandler.GetResultWithExplicitProctoringStatus());
     }
 

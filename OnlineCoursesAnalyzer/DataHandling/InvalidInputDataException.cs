@@ -3,12 +3,21 @@
 public class InvalidInputDataException : Exception
 {
     public InvalidInputDataException(string message)
-        : base(message)
+        : this(message, message)
     {
     }
 
-    public InvalidInputDataException(string message, Exception innerException)
+    public InvalidInputDataException(string message, string externalMessage)
+    : base(message)
+    {
+        this.ExternalMessage = externalMessage;
+    }
+
+    public InvalidInputDataException(string message, string externalMessage, Exception innerException)
     : base(message, innerException)
     {
+        this.ExternalMessage = externalMessage;
     }
+
+    public string ExternalMessage { get; }
 }
