@@ -30,8 +30,4 @@
     <ProjectReference Include="..\OnlineCoursesAnalyzer\OnlineCoursesAnalyzer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\" />
-  </ItemGroup>
-
 </Project>

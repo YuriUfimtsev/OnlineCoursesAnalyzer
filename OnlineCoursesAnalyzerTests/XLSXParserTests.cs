@@ -14,7 +14,7 @@ public class XLSXParserTests
     [Test]
     public void StandartTest()
     {
-        var stream = File.OpenRead(GetPathToFile("1.xlsx"));
+        var stream = File.OpenRead(GetPathToFile("StandartData.xlsx"));
         var requiredColumnNames = new [] { "Фамилия", "Имя", "Город" };
         var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataWithoutFirstRow(stream, requiredColumnNames, 0);
         var expectedDataWithRowNumbers = new List<string[]>
@@ -30,7 +30,7 @@ public class XLSXParserTests
     [Test]
     public void SomeNullRowsInsideTest()
     {
-        var stream = File.OpenRead(GetPathToFile("2.xlsx"));
+        var stream = File.OpenRead(GetPathToFile("DataWithNullRowsInside.xlsx"));
         var requiredColumnNames = new [] { "Фамилия", "Имя", "Город" };
         var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataWithoutFirstRow(stream, requiredColumnNames, 12);
         var expectedNullRowNumbers = new List<string> { "2", "4", "5", "6", "8", "11" };
@@ -41,7 +41,7 @@ public class XLSXParserTests
     [Test]
     public void CompletelyNullRowsAtTheEndOfTheTableTest()
     {
-        var stream = File.OpenRead(GetPathToFile("3.xlsx"));
+        var stream = File.OpenRead(GetPathToFile("DataWithNullRowsAtTheEndOfTheTable.xlsx"));
         var requiredColumnNames = new [] { "Фамилия", "Имя", "Город" };
         var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataWithoutFirstRow(stream, requiredColumnNames, 12);
         Assert.That(nullRows.Count, Is.EqualTo(0));
@@ -51,7 +51,7 @@ public class XLSXParserTests
     [Test]
     public void NotCompletelyNullRowsAtTheEndOfTheTableTest()
     {
-        var stream = File.OpenRead(GetPathToFile("4.xlsx"));
+        var stream = File.OpenRead(GetPathToFile("DataWithNotCompletelyNullRowsAtTheEndOfTheTable.xlsx"));
         var requiredColumnNames = new [] { "Фамилия", "Имя", "Город" };
         var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataWithoutFirstRow(stream, requiredColumnNames, 12);
         var expectedNullRowNumbers = new List<string> { "9", "10", "11", "12" };
@@ -62,7 +62,7 @@ public class XLSXParserTests
     [Test]
     public void MoreNullRowsThanAllowedTest()
     {
-        var stream = File.OpenRead(GetPathToFile("5.xlsx"));
+        var stream = File.OpenRead(GetPathToFile("DataWithFiveNullRows.xlsx"));
         var requiredColumnNames = new [] { "Фамилия", "Имя", "Город" };
         Assert.Throws<InvalidInputDataException>(() => XLSXParser.GetDataWithoutFirstRow(
             stream,
@@ -84,7 +84,7 @@ public class XLSXParserTests
     [Test]
     public void AllowedNumberOfErrorRowsParameterLessThanZeroTest()
     {
-        var stream = File.OpenRead(GetPathToFile("1.xlsx"));
+        var stream = File.OpenRead(GetPathToFile("StandartData.xlsx"));
         var requiredColumnNames = new [] { "Фамилия", "Имя", "Город" };
         var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataWithoutFirstRow(stream, requiredColumnNames, -5);
     }
@@ -92,7 +92,7 @@ public class XLSXParserTests
     [Test]
     public void EmptyRequiredColumnNamesParameterTest()
     {
-        var stream = File.OpenRead(GetPathToFile("1.xlsx"));
+        var stream = File.OpenRead(GetPathToFile("StandartData.xlsx"));
         var requiredColumnNames = new string[] { };
         var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataWithoutFirstRow(stream, requiredColumnNames, 1);
         var expectedData = new List<string[]> { new [] { "2" }, new [] { "3" }, new [] { "4" } };
@@ -103,7 +103,7 @@ public class XLSXParserTests
     [Test]
     public void RequiredColumnNameIsMissingInTheTableTest()
     {
-        var stream = File.OpenRead(GetPathToFile("1.xlsx"));
+        var stream = File.OpenRead(GetPathToFile("StandartData.xlsx"));
         var requiredColumnNames = new [] { "Фамилия", "Имя", "Город", "Регион" };
         Assert.Throws<InvalidInputDataException>(() => XLSXParser.GetDataWithoutFirstRow(
             stream,

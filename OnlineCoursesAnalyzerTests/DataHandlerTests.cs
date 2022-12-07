@@ -68,6 +68,20 @@ public class DataHandlerTests
     }
 
     [Test]
+    public void GetGradeTest()
+    {
+        var gradePercentArray = new[] { "90.0", "50", "87.9", "61", "70.3" };
+        var gradeArray = new string[5];
+        for (var i = 0; i < gradePercentArray.Length; ++i)
+        {
+            gradeArray[i] = Grade.GetGrade(gradePercentArray[i]).ToString();
+        }
+
+        var expectedGradeArray = new[] { "A", "E", "B", "D", "C" };
+        Assert.That(gradeArray, Is.EqualTo(expectedGradeArray));
+    }
+
+    [Test]
     public void AddEducationalAchievmentDataFileStandartTest()
     {
         var dataHandler = new DataHandler();
@@ -204,5 +218,56 @@ public class DataHandlerTests
         var (studentsData, errorStudents) = dataHandler.GetResultWithExplicitProctoringStatus();
         Assert.That(errorStudents.Count, Is.EqualTo(0));
         Assert.That(CompareStudentDataLists(expectedResult, studentsData));
+    }
+
+    [Test]
+    public void GetResultWithSomeErrorsTest()
+    {
+        var dataHandler = new DataHandler();
+        var educationalAchievementFileStream = File.OpenRead(GetPathToFile("EducationalAchievmentDataWithSomeErrors.xlsx"));
+        var proctoringStatusFileStream = File.OpenRead(GetPathToFile("ProctoringStatusDataWithSomeErrors.xlsx"));
+        dataHandler.AddEducationalAchievementData(educationalAchievementFileStream);
+        dataHandler.AddProctoringStatusData(proctoringStatusFileStream);
+        if (EducationalAchievementFile.AllowedNumberOfStudentsWithoutProctoringStatus
+            < dataHandler.EducationalAchievementData!.Count - dataHandler.ProctoringStatusData!.Count)
+        {
+            Assert.Throws<InvalidInputDataException>(() => dataHandler.GetResultWithExplicitProctoringStatus());
+            return;
+        }
+
+        var (studentsData, errorStudents) = dataHandler.GetResultWithExplicitProctoringStatus();
+        Assert.That(studentsData.Count, Is.EqualTo(2));
+        Assert.That(errorStudents.Count, Is.EqualTo(3));
+    }
+
+    [Test]
+    public void GetResultWithManyErrorsTest()
+    {
+        var dataHandler = new DataHandler();
+        var educationalAchievementFileStream = File.OpenRead(GetPathToFile("EducationalAchievmentBigData.xlsx"));
+        var proctoringStatusFileStream = File.OpenRead(GetPathToFile("ProctoringStatusRow.xlsx"));
+        dataHandler.AddEducationalAchievementData(educationalAchievementFileStream);
+        dataHandler.AddProctoringStatusData(proctoringStatusFileStream);
+        if (EducationalAchievementFile.AllowedNumberOfStudentsWithoutProctoringStatus
+            >= dataHandler.EducationalAchievementData!.Count - dataHandler.ProctoringStatusData!.Count)
+        {
+            var (studentsData, errorStudents) = dataHandler.GetResultWithExplicitProctoringStatus();
+            Assert.That(studentsData.Count, Is.EqualTo(1));
+            Assert.That(errorStudents.Count, Is.EqualTo(100));
+            return;
+        }
+
+        Assert.Throws<InvalidInputDataException>(() => dataHandler.GetResultWithExplicitProctoringStatus());
+    }
+
+    [Test]
+    public void IsNotNullProctoringDataMoreThanNotNullEducationalAchievmentDataTest()
+    {
+        var dataHandler = new DataHandler();
+        var educationalAchievementFileStream = File.OpenRead(GetPathToFile("EducationalAchievmentStandartData.xlsx"));
+        var proctoringStatusFileStream = File.OpenRead(GetPathToFile("ProctoringStatusBigData.xlsx"));
+        dataHandler.AddEducationalAchievementData(educationalAchievementFileStream);
+        dataHandler.AddProctoringStatusData(proctoringStatusFileStream);
+        Assert.That(dataHandler.IsNotNullProctoringDataMoreThanNotNullEducationalAchievmentData);
     }
 }
