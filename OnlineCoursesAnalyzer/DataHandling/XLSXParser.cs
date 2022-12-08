@@ -2,6 +2,7 @@
 using OnlineCoursesAnalyzer.Data;
 
 namespace OnlineCoursesAnalyzer.DataHandling;
+
 public static class XLSXParser
 {
     public static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataWithoutFirstRow(

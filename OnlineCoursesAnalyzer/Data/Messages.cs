@@ -43,7 +43,7 @@ public static class Messages
     }
 
     public static string GenerateFileUploadErrorMessage(int errorRowsCount)
-    => GenerateComplexMessage($"Файл не загружен. {errorRowsCount} строк содержат ошибки.", GetMoreInformation);
+        => GenerateComplexMessage($"Файл не загружен. {errorRowsCount} строк содержат ошибки.", GetMoreInformation);
 
     public static string GenerateFileUploadErrorMessageWithInvalidRows(List<string> errorRowNumbers)
     {

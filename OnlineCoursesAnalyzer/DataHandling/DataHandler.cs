@@ -154,15 +154,9 @@ public class DataHandler
     private static (bool IsInterpretationCorrect, bool InterpretationResult) InterpretProctoringStatus(
         string proctoringData)
     {
-        var isInterpretationCorrect = true;
         var interpretationResult = proctoringData == ProctoringStatusFile.ProctoringStatusIsTrue;
-        if (interpretationResult || (!interpretationResult && proctoringData == ProctoringStatusFile.ProctoringStatusIsFalse))
-        {
-            return (isInterpretationCorrect, interpretationResult);
-        }
-        else
-        {
-            return (!isInterpretationCorrect, interpretationResult);
-        }
+        return (
+            interpretationResult || (!interpretationResult && proctoringData == ProctoringStatusFile.ProctoringStatusIsFalse),
+            interpretationResult);
     }
 }

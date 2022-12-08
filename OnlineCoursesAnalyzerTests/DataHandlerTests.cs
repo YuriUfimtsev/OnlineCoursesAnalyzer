@@ -78,7 +78,7 @@ public class DataHandlerTests
         }
     }
 
-        [Test]
+    [Test]
     public void GetGradeTest()
     {
         var gradePercentArray = new[] { "90.0", "50", "87.9", "61", "70.3" };
