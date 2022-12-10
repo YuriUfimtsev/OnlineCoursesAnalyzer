@@ -71,7 +71,7 @@
 
     <div class="row @displayClassInvertion">
         <button class="btn-sm btn-outline-dark btn-block" @onclick="ChangeView">
-            Стандартный вид
+            Изменить вид
         </button>
     </div>
 
@@ -132,6 +132,9 @@
         this.bodyPaddingTop = "40px";
     }
 
+    /// <summary>
+    /// Supported file types.
+    /// </summary>
     private enum FileType
     {
         EducationalAchievementData,

@@ -3,8 +3,20 @@ using OnlineCoursesAnalyzer.Data;
 
 namespace OnlineCoursesAnalyzer.DataHandling;
 
+/// <summary>
+/// Implements .xlsx files processing.
+/// </summary>
 public static class XLSXParser
 {
+    /// <summary>
+    /// Converts .xlsx data to a list of values without first row data.
+    /// </summary>
+    /// <param name="stream">.xlsx file stream.</param>
+    /// <param name="requiredColumnNames">Columns defining the resulting data set.</param>
+    /// <param name="significantColumnNames">Columns that must contain data for each row.
+    /// The row is treated as containing error otherwise.</param>
+    /// <param name="allowedNumberOfErrorRows">The number above which processing will be interrupted and an exception thrown.</param>
+    /// <returns>List of values and list of row numbers not containing values in significant columns.</returns>
     public static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataWithoutFirstRow(
         Stream stream,
         string[] requiredColumnNames,
@@ -18,6 +30,17 @@ public static class XLSXParser
             "none",
             allowedNumberOfErrorRows);
 
+    /// <summary>
+    /// Converts .xlsx data to a list of values without first row data. Selects rows based on the presence of requiredDataInConditionColumn value in conditionColumnName column.
+    /// </summary>
+    /// <param name="stream">.xlsx file stream.</param>
+    /// <param name="requiredColumnNames">Columns defining the resulting data set.</param>
+    /// <param name="significantColumnNames">Columns that must contain data for each row.
+    /// The row is treated as containing error otherwise.</param>
+    /// <param name="conditionColumnName">The column by which the selection will take place.</param>
+    /// <param name="requiredDataInConditionColumn">The required value contained in the conditionColumnName column.</param>
+    /// <param name="allowedNumberOfErrorRows">The number above which processing will be interrupted and an exception thrown.</param>
+    /// <returns>List of values and list of row numbers not containing values in significant columns.</returns>
     public static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataByTheColumnContainsConditionWithoutFirstRow(
         Stream stream,
         string[] requiredColumnNames,

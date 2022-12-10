@@ -1,7 +1,19 @@
 ﻿namespace OnlineCoursesAnalyzer.Data;
 
+/// <summary>
+/// Implements the student representation.
+/// </summary>
 public class Student
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Student"/> class.
+    /// </summary>
+    /// <param name="email">Student email address.</param>
+    /// <param name="secondName">Student surname.</param>
+    /// <param name="firstName">Student name.</param>
+    /// <param name="lastName">Student patronymic.</param>
+    /// <param name="grade">Student grade for course.</param>
+    /// <param name="proctoringStatus">Student proctoring status.</param>
     public Student(string email, string secondName, string firstName, string lastName, string grade, string proctoringStatus)
     {
         this.SecondName = secondName;
@@ -12,20 +24,46 @@ public class Student
         this.Email = email;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Student"/> class.
+    /// </summary>
+    /// <param name="email">Student email address.</param>
+    /// <param name="secondName">Student surname.</param>
+    /// <param name="firstName">Student name.</param>
+    /// <param name="lastName">Student patronymic.</param>
+    /// <param name="grade">Student grade for course.</param>
     public Student(string email, string secondName, string firstName, string lastName, string grade)
         : this(email, secondName, firstName, lastName, grade, string.Empty)
     {
     }
 
+    /// <summary>
+    /// Gets the student email address.
+    /// </summary>
     public string Email { get; }
 
+    /// <summary>
+    /// Gets the student surname.
+    /// </summary>
     public string SecondName { get; }
 
+    /// <summary>
+    /// Gets the student name.
+    /// </summary>
     public string FirstName { get; }
 
+    /// <summary>
+    /// Gets the student patronymic.
+    /// </summary>
     public string LastName { get; }
 
+    /// <summary>
+    /// Gets the student grade for course.
+    /// </summary>
     public string Grade { get; }
 
+    /// <summary>
+    /// Gets or sets the student proctoring status.
+    /// </summary>
     public string ProctoringStatus { get; set; }
 }

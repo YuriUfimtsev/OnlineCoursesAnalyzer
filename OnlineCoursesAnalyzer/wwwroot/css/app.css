@@ -39,18 +39,6 @@ a,
     align-items: center;
 }
 
-/*.navbar {
-    margin-bottom: 10px;
-}*/
-
-/*    .disabled {
-        display: none;
-    }
-
-    .show {
-        display: block;
-    }*/
-
 .nav-item a {
     color: #d7d7d7;
     border-radius: 4px;
@@ -69,11 +57,6 @@ a,
         background-color: rgba(255, 255, 255, 2);
         color: white;
     }
-
-/*body {
-    padding-top: 40px;
-    padding-bottom: 20px;
-}*/
 
 .alert {
     height: 100%;

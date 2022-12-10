@@ -2,8 +2,14 @@
 
 namespace OnlineCoursesAnalyzer.DataHandling;
 
+/// <summary>
+/// Implements the aducational achievement data and proctoring status data handling.
+/// </summary>
 public class DataHandler
 {
+    /// <summary>
+    /// Array of educational achievement file column names from which data should be obtained.
+    /// </summary>
     private static readonly string[] RequiredDataFromEducationalAchievementFile =
     {
         EducationalAchievementFile.EmailColumn,
@@ -13,17 +19,28 @@ public class DataHandler
         EducationalAchievementFile.GradePercentColumn,
     };
 
-    // Columns in which missed value will be considered as an error.
+    /// <summary>
+    /// Columns in which a missing value will be treated as an error.
+    /// </summary>
     private static readonly string[] EducationalAchievementFileSignificantColumns =
     {
         EducationalAchievementFile.EmailColumn,
         EducationalAchievementFile.GradePercentColumn,
     };
 
+    /// <summary>
+    /// Educational achievement file column name by which the data will be selected.
+    /// </summary>
     private static readonly string ConditionEducationalAchievementFileColumn = EducationalAchievementFile.FacultyNamesColumn;
 
-    private static readonly string EducationalAchievementFileCondition = EducationalAchievementFile.MathmechFacultyName;
+    /// <summary>
+    /// Condition for data selection.
+    /// </summary>
+    private static readonly string EducationalAchievementFileCondition = EducationalAchievementFile.MathMechFacultyName;
 
+    /// <summary>
+    /// Array of proctoring status file column names from which data should be obtained.
+    /// </summary>
     private static readonly string[] RequiredDataFromProctoringStatusFile =
     {
         ProctoringStatusFile.EmailColumn,
@@ -33,10 +50,23 @@ public class DataHandler
     private List<(Student, bool)>? studentsDataWithExplicitProctoringStatus;
     private bool isNotNullDataActual;
 
+    /// <summary>
+    /// Gets educational achievement data where keys - student email addresses, values - students data.
+    /// </summary>
     public Dictionary<string, Student>? EducationalAchievementData { get; private set; }
 
+    /// <summary>
+    /// Gets proctoring status data where keys - student email addresses, values - student proctoring statuses.
+    /// </summary>
     public Dictionary<string, bool>? ProctoringStatusData { get; private set; }
 
+    /// <summary>
+    /// Adds educational achievement data to the storage.
+    /// </summary>
+    /// <param name="fileReadStream">Stream with the educational achievement data.</param>
+    /// <returns>List of row numbers containing errors.</returns>
+    /// <exception cref="InvalidInputDataException">Throws if the input data was received in an incorrect format.
+    /// View EducationalAchievementFile class as a sample.</exception>
     public List<string> AddEducationalAchievementData(Stream fileReadStream)
     {
         var (educationalAchievmentDataList, errorRows) = XLSXParser.GetDataByTheColumnContainsConditionWithoutFirstRow(
@@ -77,6 +107,13 @@ public class DataHandler
         return errorRows;
     }
 
+    /// <summary>
+    /// Adds proctoring status data to the storage.
+    /// </summary>
+    /// <param name="fileReadStream">Stream with the proctoring status data.</param>
+    /// <returns>List of row numbers containing errors.</returns>
+    /// <exception cref="InvalidInputDataException">Throws if the input data was received in an incorrect format.
+    /// View ProctoringStatusFile class as a sample.</exception>
     public List<string> AddProctoringStatusData(Stream fileReadStream)
     {
         var (proctoringStatusDataList, errorRows) = XLSXParser.GetDataWithoutFirstRow(
@@ -114,6 +151,12 @@ public class DataHandler
         return errorRows;
     }
 
+    /// <summary>
+    /// Performs processing of the saved educational achievement and proctoring status data.
+    /// </summary>
+    /// <returns>List of students with explicit proctoring status, list with email addresses of students without proctoring status.</returns>
+    /// <exception cref="InvalidInputDataException">Throws if the input data was received in an incorrect format.
+    /// View ProctoringStatusFile class and EducationalAchievementFile class as a sample.</exception>
     public (List<(Student Student, bool ProctoringStatus)> StudentsData,
         List<string> StudentsWithoutProctoringEmails) GetResultWithExplicitProctoringStatus()
     {
@@ -159,7 +202,7 @@ public class DataHandler
         {
             {
                 throw new InvalidInputDataException(
-                    Messages.GenerateComplexMessage(Messages.UnexpectedEmail, Messages.GetMoreInformation),
+                    Messages.GenerateComplexMessage(Messages.UnexpectedEmailFormat, Messages.GetMoreInformation),
                     Messages.AdvancedUnexpectedEmail);
             }
         }
