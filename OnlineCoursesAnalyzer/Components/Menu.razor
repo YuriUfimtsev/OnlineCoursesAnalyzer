@@ -1,0 +1,30 @@
+﻿@using OnlineCoursesAnalyzer.Pages;
+
+<nav class="navbar @MenuDisplayClass navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3 fixed-top">
+    <div class="container">
+        <a class="navbar-brand text-light" asp-area="" asp-page="/Index">Анализатор онлайн-курсов</a>
+        <div class="d-flex flex-column-reverse">
+            <button class="btn btn-dark btn-block text-light" @onclick="CallParentMethod">
+                Вид для печати
+            </button>
+        </div>
+    </div>
+</nav>
+
+@code {
+    [Parameter]
+    public EventCallback ChangingDisplayMethod { get; set; }
+
+    [Parameter]
+    public string MenuDisplayClass { get; set; }
+
+    public Menu()
+    {
+        this.MenuDisplayClass = string.Empty;
+    }
+
+    private async Task CallParentMethod()
+    {
+        await ChangingDisplayMethod.InvokeAsync();
+    }
+}

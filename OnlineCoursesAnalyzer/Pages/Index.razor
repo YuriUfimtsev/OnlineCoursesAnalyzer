@@ -4,12 +4,28 @@
 @using OnlineCoursesAnalyzer.DataHandling;
 @using OnlineCoursesAnalyzer.Components;
 
+<Menu MenuDisplayClass="@displayClass" ChangingDisplayMethod="@ChangeView" />
 <Modal Header="@operationStatus" HeaderStyle="@validationClass" Text="@externalMessage" @ref="modal"></Modal>
 
 <PageTitle>OnlineCoursesAnalyzer</PageTitle>
 
+<style>
+    .disabled {
+        display: none;
+    }
+
+    .show {
+        display: block;
+    }
+
+    body {
+        padding-top: @bodyPaddingTop;
+        padding-bottom: 20px;
+    }
+</style>
+
 <div class="container">
-    <div class="row">
+    <div class="row @displayClass">
         <div class="col-6 d-grid">
             <h5>Поле для данных об успеваемости</h5>
         </div>
@@ -18,7 +34,7 @@
         </div>
     </div>
 
-    <div class="row g-2">
+    <div class="row g-2 @displayClass">
         <div class="col-6 d-grid">
             <div class="upload-container @firstContainerHoverClass">
                 <img src="uploadContainerImg.svg">
@@ -39,7 +55,8 @@
         </div>
     </div>
 
-    <div class="row g-2">
+
+    <div class="row g-3 @displayClass">
         <div class="col-3 d-grid">
             <button type="button" class="btn btn-outline-dark btn-block" @onclick="GetResult">
             Получить результат
@@ -52,9 +69,16 @@
         </div>
     </div>
 
+    <div class="row @displayClassInvertion">
+        <button class="btn-sm btn-outline-dark btn-block" @onclick="ChangeView">
+            Стандартный вид
+        </button>
+    </div>
+
     <div class="row">
         <TableTemplate Items="this.students" TItem="Student">
             <TableHeader>
+                <th>Почта</th>
                 <th>Фамилия</th>
                 <th>Имя</th>
                 <th>Отчество</th>
@@ -62,6 +86,7 @@
                 <th>Статус прокторинга</th>
             </TableHeader>
             <RowTemplate>
+                <td>@context.Email</td>
                 <td>@context.SecondName</td>
                 <td>@context.FirstName</td>
                 <td>@context.LastName</td>
@@ -76,6 +101,10 @@
     private Modal? modal;
     private DataHandler dataHandler;
     private List<(Student, bool)>? students;
+
+    private string displayClass;
+    private string displayClassInvertion;
+    private string bodyPaddingTop;
 
     private string message;
     private string externalMessage;
@@ -98,12 +127,22 @@
         this.proctoringStatusDataFileName = string.Empty; 
         this.educationalAchievementDataFileName = string.Empty;
         this.externalMessage = string.Empty;
+        this.displayClass = string.Empty;
+        this.displayClassInvertion = "disabled";
+        this.bodyPaddingTop = "40px";
     }
 
     private enum FileType
     {
         EducationalAchievementData,
         ProctoringStatusData,
+    }
+
+    private void ChangeView()
+    {
+        this.displayClass = this.displayClass == "disabled" ? "" : "disabled";
+        this.displayClassInvertion = this.displayClass == "disabled" ? "" : "disabled";
+        this.bodyPaddingTop = this.displayClass == "disabled" ? "5px" : "40px";
     }
 
     private void OnFirstContainerDragover() => this.firstContainerHoverClass = "hover";
@@ -170,28 +209,9 @@
             this.students = studentsData;
             if (studentsWithoutProctoringStatus.Count > 0)
             {
-                if (this.dataHandler.IsNotNullProctoringDataMoreThanNotNullEducationalAchievmentData)
-                {
-                    this.WithWarning(
-                        Messages.GenerateComplexMessage(
-                            Messages.MoreProctoringDataThanEducationalAchievmentData,
-                            Messages.GenerateFilesProcessingWarningMessage(studentsWithoutProctoringStatus.Count)),
-                        Messages.GenerateComplexMessage(
-                            Messages.MoreProctoringDataThanEducationalAchievmentData,
-                            Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(studentsWithoutProctoringStatus)));
-                }
-                else
-                {
-                    this.WithWarning(
-                        Messages.GenerateFilesProcessingWarningMessage(studentsWithoutProctoringStatus.Count),
-                        Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(studentsWithoutProctoringStatus));
-                }
-            }
-            else if (this.dataHandler.IsNotNullProctoringDataMoreThanNotNullEducationalAchievmentData)
-            {
                 this.WithWarning(
-                    Messages.MoreProctoringDataThanEducationalAchievmentData,
-                    Messages.MoreProctoringDataThanEducationalAchievmentData);
+                    Messages.GenerateFilesProcessingWarningMessage(studentsWithoutProctoringStatus.Count),
+                    Messages.GenerateFilesProcessingWarningMessageWithStudentEmails(studentsWithoutProctoringStatus));
             }
             else
             {

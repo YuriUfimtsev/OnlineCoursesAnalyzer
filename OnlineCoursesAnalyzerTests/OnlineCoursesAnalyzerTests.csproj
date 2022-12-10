@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Data\DataWithFiveNullRows.xlsx">
+    <Content Include="Data\XLSXParserTestsData\DataWithFiveNullRows.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -39,52 +39,61 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\DataWithNotCompletelyNullRowsAtTheEndOfTheTable.xlsx">
+    <None Update="Data\DataHandlerTestsData\EducationalAchievmentDataWithManyNotMathmechStudentsErrorRows.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\DataWithNullRowsAtTheEndOfTheTable.xlsx">
+    <None Update="Data\XLSXParserTestsData\DataWithNotCompletelyNullRowsAtTheEndOfTheTable.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\DataWithNullRowsInside.xlsx">
+    <None Update="Data\XLSXParserTestsData\DataWithNullRowsAtTheEndOfTheTable.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\EducationalAchievmentBigData.xlsx">
+    <None Update="Data\XLSXParserTestsData\DataWithNullRowsInside.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\EducationalAchievmentDataWithManyErrorRows.xlsx">
+    <None Update="Data\XLSXParserTestsData\DataWithSeveralEmptyColumns.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\EducationalAchievmentDataWithSomeErrors.xlsx">
+    <None Update="Data\DataHandlerTestsData\EducationalAchievmentBigData.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\EducationalAchievmentDataWithTwoEqualsStudentEmails.xlsx">
+    <None Update="Data\DataHandlerTestsData\EducationalAchievmentDataWithManyErrorRows.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\EducationalAchievmentStandartData.xlsx">
+    <None Update="Data\DataHandlerTestsData\EducationalAchievmentDataWithSomeErrors.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Empty.pdf">
+    <None Update="Data\DataHandlerTestsData\EducationalAchievmentDataWithTwoEqualsStudentEmails.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\ProctoringStatusBigData.xlsx">
+    <None Update="Data\DataHandlerTestsData\EducationalAchievmentStandartData.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\ProctoringStatusDataWithManyErrorRows.xlsx">
+    <None Update="Data\XLSXParserTestsData\Empty.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\ProctoringStatusDataWithSomeErrors.xlsx">
+    <None Update="Data\XLSXParserTestsData\ErrorData.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\ProctoringStatusDataWithTwoEqualsStudentEmails.xlsx">
+    <None Update="Data\DataHandlerTestsData\ProctoringStatusBigData.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\ProctoringStatusRow.xlsx">
+    <None Update="Data\DataHandlerTestsData\ProctoringStatusDataWithManyErrorRows.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\ProctoringStatusStandartData.xlsx">
+    <None Update="Data\DataHandlerTestsData\ProctoringStatusDataWithSomeErrors.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\StandartData.xlsx">
+    <None Update="Data\DataHandlerTestsData\ProctoringStatusDataWithTwoEqualsStudentEmails.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\DataHandlerTestsData\ProctoringStatusRow.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\DataHandlerTestsData\ProctoringStatusStandartData.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\XLSXParserTestsData\StandartData.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

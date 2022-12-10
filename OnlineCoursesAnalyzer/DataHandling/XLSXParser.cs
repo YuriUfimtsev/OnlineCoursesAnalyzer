@@ -8,11 +8,44 @@ public static class XLSXParser
     public static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataWithoutFirstRow(
         Stream stream,
         string[] requiredColumnNames,
+        string[] significantColumnNames,
+        int allowedNumberOfErrorRows) => GetDataByTheColumnContainsConditionWithoutFirstRowBaseFunction(
+            stream,
+            requiredColumnNames,
+            significantColumnNames,
+            false,
+            "-1",
+            "none",
+            allowedNumberOfErrorRows);
+
+    public static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataByTheColumnContainsConditionWithoutFirstRow(
+        Stream stream,
+        string[] requiredColumnNames,
+        string[] significantColumnNames,
+        string conditionColumnName,
+        string requiredDataInConditionColumn,
+        int allowedNumberOfErrorRows) => GetDataByTheColumnContainsConditionWithoutFirstRowBaseFunction(
+            stream,
+            requiredColumnNames,
+            significantColumnNames,
+            true,
+            conditionColumnName,
+            requiredDataInConditionColumn,
+            allowedNumberOfErrorRows);
+
+    private static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataByTheColumnContainsConditionWithoutFirstRowBaseFunction(
+        Stream stream,
+        string[] requiredColumnNames,
+        string[] significantColumnNames,
+        bool isConditionSet,
+        string conditionColumnName,
+        string requiredDataInConditionColumn,
         int allowedNumberOfErrorRows)
     {
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
         allowedNumberOfErrorRows = allowedNumberOfErrorRows >= 0 ? allowedNumberOfErrorRows : 0;
+
         var nullRowsNumbers = new List<string>();
         var dataWithRowsNumbers = new List<string[]>();
         try
@@ -20,39 +53,45 @@ public static class XLSXParser
             using var package = new ExcelPackage(stream);
             var worksheet = package.Workbook.Worksheets[0];
             var requiredColumnNumbers = GetColumnNumbersFromNames(worksheet, requiredColumnNames);
+            var significantColumnNumbers = GetColumnNumbersFromNames(worksheet, significantColumnNames);
+            var conditionColumnNumber = isConditionSet ? GetColumnNumbersFromNames(worksheet, new[] { conditionColumnName })[0] : -1;
             var completelyNullRowSubsequenceLength = 0;
             var firstRowNumberInCompletelyNullRowSubsequence = 0;
             for (var i = 2; i <= worksheet.Dimension.Rows; ++i)
             {
-                var (rowDataAndNumber, doesRowContainNull, isCompletelyNullRow)
-                    = GetRowData(worksheet, i, requiredColumnNumbers);
-                if (!doesRowContainNull)
+                var conditionColumnValue = isConditionSet ? worksheet.Cells[i, conditionColumnNumber].Value : null;
+                if (!isConditionSet || (isConditionSet && conditionColumnValue != null && conditionColumnValue.ToString()!.Contains(requiredDataInConditionColumn)))
                 {
-                    dataWithRowsNumbers.Add(rowDataAndNumber!);
-                }
-                else if (!isCompletelyNullRow)
-                {
-                    nullRowsNumbers.Add(i.ToString());
-                    CheckNullRowNumbersListCount(allowedNumberOfErrorRows, nullRowsNumbers);
-                }
-                else
-                {
-                    if ((firstRowNumberInCompletelyNullRowSubsequence + completelyNullRowSubsequenceLength) == i)
+                    var (rowDataAndNumber, doesRowContainNull, isCompletelyNullRow)
+                    = GetRowData(worksheet, i, requiredColumnNumbers, significantColumnNumbers);
+                    if (!doesRowContainNull)
                     {
-                        completelyNullRowSubsequenceLength++;
+                        dataWithRowsNumbers.Add(rowDataAndNumber!);
+                    }
+                    else if (!isCompletelyNullRow)
+                    {
+                        nullRowsNumbers.Add(i.ToString());
+                        CheckNullRowNumbersListCount(allowedNumberOfErrorRows, nullRowsNumbers);
                     }
                     else
                     {
-                        for (var j = firstRowNumberInCompletelyNullRowSubsequence;
-                            j < firstRowNumberInCompletelyNullRowSubsequence + completelyNullRowSubsequenceLength;
-                            ++j)
+                        if ((firstRowNumberInCompletelyNullRowSubsequence + completelyNullRowSubsequenceLength) == i)
                         {
-                            nullRowsNumbers.Add(j.ToString());
-                            CheckNullRowNumbersListCount(allowedNumberOfErrorRows, nullRowsNumbers);
+                            completelyNullRowSubsequenceLength++;
                         }
+                        else
+                        {
+                            for (var j = firstRowNumberInCompletelyNullRowSubsequence;
+                                j < firstRowNumberInCompletelyNullRowSubsequence + completelyNullRowSubsequenceLength;
+                                ++j)
+                            {
+                                nullRowsNumbers.Add(j.ToString());
+                                CheckNullRowNumbersListCount(allowedNumberOfErrorRows, nullRowsNumbers);
+                            }
 
-                        firstRowNumberInCompletelyNullRowSubsequence = i;
-                        completelyNullRowSubsequenceLength = 1;
+                            firstRowNumberInCompletelyNullRowSubsequence = i;
+                            completelyNullRowSubsequenceLength = 1;
+                        }
                     }
                 }
             }
@@ -111,10 +150,11 @@ public static class XLSXParser
         return requiredColumnNumbers;
     }
 
-    private static (string[] RowData, bool DoesRowContainNull, bool IsCompletelyNullRow) GetRowData(
+    private static (string[] RowData, bool IsSignificantValueNull, bool IsCompletelyNullRow) GetRowData(
         ExcelWorksheet sheet,
         int rowNumber,
-        int[] requiredColumnNumbers)
+        int[] requiredColumnNumbers,
+        int[] notNullRequiredColumnsNumbers)
     {
         var doesRowContainNull = false;
         var isCompletelyNullRow = true;
@@ -127,14 +167,18 @@ public static class XLSXParser
                 rowData[j] = value.ToString()!;
                 isCompletelyNullRow = false;
             }
-            else
+            else if (notNullRequiredColumnsNumbers.Contains(requiredColumnNumbers[j]))
             {
                 doesRowContainNull = true;
+                rowData[j] = string.Empty;
+            }
+            else
+            {
+                rowData[j] = string.Empty;
             }
         }
 
         rowData[rowData.Length - 1] = rowNumber.ToString();
-
         return (rowData, doesRowContainNull, isCompletelyNullRow);
     }
 }

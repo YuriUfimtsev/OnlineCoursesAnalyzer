@@ -15,8 +15,10 @@ public static class Messages
 
     public static string NotEnoughData { get; } = "Недостаточно данных. Загрузите файлы";
 
-    public static string MoreProctoringDataThanEducationalAchievmentData { get; }
-        = "Не для всех студентов с данными о прохождении прокторинга найдена дополнительная информация";
+    public static string UnexpectedEmail { get; } = "Неожиданный формат почтового адреса.";
+
+    public static string AdvancedUnexpectedEmail { get; } = $"Неожиданный формат почтового адреса." +
+        $" Проверьте, что все адреса формата {EducationalAchievementFile.ExpectedEmailFormat}.";
 
     public static string GenerateFileInProcessUploadMessage(string fileName) => $"Файл '{fileName}' загружается";
 

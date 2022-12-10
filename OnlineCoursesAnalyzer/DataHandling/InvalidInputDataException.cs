@@ -7,10 +7,10 @@ public class InvalidInputDataException : Exception
     {
     }
 
-    public InvalidInputDataException(string message, string externalMessage)
+    public InvalidInputDataException(string message, string advancedMessage)
         : base(message)
     {
-        this.ExternalMessage = externalMessage;
+        this.ExternalMessage = advancedMessage;
     }
 
     public InvalidInputDataException(string message, string externalMessage, Exception innerException)

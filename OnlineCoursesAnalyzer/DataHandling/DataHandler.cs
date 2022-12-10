@@ -13,6 +13,17 @@ public class DataHandler
         EducationalAchievementFile.GradePercentColumn,
     };
 
+    // Columns in which missed value will be considered as an error.
+    private static readonly string[] EducationalAchievementFileSignificantColumns =
+    {
+        EducationalAchievementFile.EmailColumn,
+        EducationalAchievementFile.GradePercentColumn,
+    };
+
+    private static readonly string ConditionEducationalAchievementFileColumn = EducationalAchievementFile.FacultyNamesColumn;
+
+    private static readonly string EducationalAchievementFileCondition = EducationalAchievementFile.MathmechFacultyName;
+
     private static readonly string[] RequiredDataFromProctoringStatusFile =
     {
         ProctoringStatusFile.EmailColumn,
@@ -26,20 +37,14 @@ public class DataHandler
 
     public Dictionary<string, bool>? ProctoringStatusData { get; private set; }
 
-    public bool IsNotNullProctoringDataMoreThanNotNullEducationalAchievmentData
-    {
-        get
-        {
-            return this.EducationalAchievementData == null || this.ProctoringStatusData == null
-                ? false : this.ProctoringStatusData!.Count > this.EducationalAchievementData!.Count;
-        }
-    }
-
     public List<string> AddEducationalAchievementData(Stream fileReadStream)
     {
-        var (educationalAchievmentDataList, errorRows) = XLSXParser.GetDataWithoutFirstRow(
+        var (educationalAchievmentDataList, errorRows) = XLSXParser.GetDataByTheColumnContainsConditionWithoutFirstRow(
             fileReadStream,
             RequiredDataFromEducationalAchievementFile,
+            EducationalAchievementFileSignificantColumns,
+            ConditionEducationalAchievementFileColumn,
+            EducationalAchievementFileCondition,
             EducationalAchievementFile.AllowedNumberOfErrorRows);
         var educationalAchievmentDataDictionary = new Dictionary<string, Student>();
         foreach (var rowData in educationalAchievmentDataList)
@@ -47,7 +52,7 @@ public class DataHandler
             try
             {
                 var grade = Grade.GetGrade(rowData[4]);
-                var student = new Student(rowData[1], rowData[2], rowData[3], grade.ToString());
+                var student = new Student(rowData[0], rowData[1], rowData[2], rowData[3], grade.ToString());
                 educationalAchievmentDataDictionary.Add(rowData[0], student);
             }
             catch (FormatException)
@@ -76,6 +81,7 @@ public class DataHandler
     {
         var (proctoringStatusDataList, errorRows) = XLSXParser.GetDataWithoutFirstRow(
             fileReadStream,
+            RequiredDataFromProctoringStatusFile,
             RequiredDataFromProctoringStatusFile,
             ProctoringStatusFile.AllowedNumberOfErrorRows);
         var proctoringStatusDataDictionary = new Dictionary<string, bool>();
@@ -144,11 +150,30 @@ public class DataHandler
             }
         }
 
-        studentsData.Sort((firstElement, secondElement)
-            => firstElement.Item1.SecondName.CompareTo(secondElement.Item1.SecondName));
+        try
+        {
+            studentsData.Sort((firstElement, secondElement)
+                    => EmailComparerWithExpectedFormat(firstElement.Item1.Email, secondElement.Item1.Email));
+        }
+        catch (InvalidOperationException)
+        {
+            {
+                throw new InvalidInputDataException(
+                    Messages.GenerateComplexMessage(Messages.UnexpectedEmail, Messages.GetMoreInformation),
+                    Messages.AdvancedUnexpectedEmail);
+            }
+        }
+
         this.studentsDataWithExplicitProctoringStatus = studentsData;
         this.isNotNullDataActual = true;
         return (studentsData, studentWithoutProctoringEmails);
+    }
+
+    private static int EmailComparerWithExpectedFormat(string firstEmail, string secondEmail)
+    {
+        var firstEmailNumber = int.Parse(firstEmail.Substring(2, 6));
+        var secondEmailNumber = int.Parse(secondEmail.Substring(2, 6));
+        return firstEmailNumber.CompareTo(secondEmailNumber);
     }
 
     private static (bool IsInterpretationCorrect, bool InterpretationResult) InterpretProctoringStatus(
