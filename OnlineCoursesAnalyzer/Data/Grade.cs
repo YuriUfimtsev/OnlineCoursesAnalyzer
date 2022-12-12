@@ -5,7 +5,7 @@ namespace OnlineCoursesAnalyzer.Data;
 /// <summary>
 /// Implements the storage of actual data of the rating system.
 /// </summary>
-public class Grade
+public static class Grade
 {
     /// <summary>
     /// Contains an up-to-date rating system.
