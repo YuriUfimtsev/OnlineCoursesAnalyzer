@@ -50,7 +50,8 @@ public static class Grade
     /// <returns>Student grade.</returns>
     public static Grades GetGrade(string gradePercent)
     {
-        var percent = (int)Math.Truncate(float.Parse(gradePercent, CultureInfo.InvariantCulture));
+        var value = float.Parse(gradePercent, CultureInfo.InvariantCulture) * 100;
+        var percent = (int)Math.Truncate(value);
         return percent switch
         {
             >= 90 => Grades.A,

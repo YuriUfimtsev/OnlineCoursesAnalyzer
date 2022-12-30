@@ -21,13 +21,13 @@ public static class XLSXParser
         Stream stream,
         string[] requiredColumnNames,
         string[] significantColumnNames,
-        int allowedNumberOfErrorRows) => GetDataByTheColumnContainsConditionWithoutFirstRowBaseFunction(
+        int allowedNumberOfErrorRows) => GetDataByConditionWithoutFirstRowBaseFunction(
             stream,
             requiredColumnNames,
             significantColumnNames,
             false,
             "-1",
-            "none",
+            (parameter) => true,
             allowedNumberOfErrorRows);
 
     /// <summary>
@@ -38,31 +38,31 @@ public static class XLSXParser
     /// <param name="significantColumnNames">Columns that must contain data for each row.
     /// The row is treated as containing error otherwise.</param>
     /// <param name="conditionColumnName">The column by which the selection will take place.</param>
-    /// <param name="requiredDataInConditionColumn">The required value contained in the conditionColumnName column.</param>
+    /// <param name="cellCondition">Condition for the cell value.</param>
     /// <param name="allowedNumberOfErrorRows">The number above which processing will be interrupted and an exception thrown.</param>
     /// <returns>List of values and list of row numbers not containing values in significant columns.</returns>
-    public static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataByTheColumnContainsConditionWithoutFirstRow(
+    public static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataByTheConditionWithoutFirstRow(
         Stream stream,
         string[] requiredColumnNames,
         string[] significantColumnNames,
         string conditionColumnName,
-        string requiredDataInConditionColumn,
-        int allowedNumberOfErrorRows) => GetDataByTheColumnContainsConditionWithoutFirstRowBaseFunction(
+        Func<string, bool> cellCondition,
+        int allowedNumberOfErrorRows) => GetDataByConditionWithoutFirstRowBaseFunction(
             stream,
             requiredColumnNames,
             significantColumnNames,
             true,
             conditionColumnName,
-            requiredDataInConditionColumn,
+            cellCondition,
             allowedNumberOfErrorRows);
 
-    private static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataByTheColumnContainsConditionWithoutFirstRowBaseFunction(
+    private static (List<string[]> DataWithRowsNumbers, List<string> NullRowsNumbers) GetDataByConditionWithoutFirstRowBaseFunction(
         Stream stream,
         string[] requiredColumnNames,
         string[] significantColumnNames,
         bool isConditionSet,
         string conditionColumnName,
-        string requiredDataInConditionColumn,
+        Func<string, bool> cellCondition,
         int allowedNumberOfErrorRows)
     {
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -83,7 +83,7 @@ public static class XLSXParser
             for (var i = 2; i <= worksheet.Dimension.Rows; ++i)
             {
                 var conditionColumnValue = isConditionSet ? worksheet.Cells[i, conditionColumnNumber].Value : null;
-                if (!isConditionSet || (isConditionSet && conditionColumnValue != null && conditionColumnValue.ToString()!.Contains(requiredDataInConditionColumn)))
+                if (!isConditionSet || (isConditionSet && cellCondition((conditionColumnValue ?? string.Empty).ToString()!)))
                 {
                     var (rowDataAndNumber, doesRowContainNull, isCompletelyNullRow)
                     = GetRowData(worksheet, i, requiredColumnNumbers, significantColumnNumbers);

@@ -1,4 +1,5 @@
 ﻿using OnlineCoursesAnalyzer.Data;
+using System.Globalization;
 
 namespace OnlineCoursesAnalyzer.DataHandling;
 
@@ -13,10 +14,11 @@ public class DataHandler
     private static readonly string[] RequiredDataFromEducationalAchievementFile =
     {
         EducationalAchievementFile.EmailColumn,
-        EducationalAchievementFile.SecondNameColumn,
-        EducationalAchievementFile.FirstNameColumn,
         EducationalAchievementFile.LastNameColumn,
-        EducationalAchievementFile.GradePercentColumn,
+        EducationalAchievementFile.FirstNameColumn,
+        EducationalAchievementFile.SecondNameColumn,
+        EducationalAchievementFile.GradeColumn,
+        EducationalAchievementFile.ControlTasksAchievementColumn,
     };
 
     /// <summary>
@@ -25,18 +27,13 @@ public class DataHandler
     private static readonly string[] EducationalAchievementFileSignificantColumns =
     {
         EducationalAchievementFile.EmailColumn,
-        EducationalAchievementFile.GradePercentColumn,
+        EducationalAchievementFile.GradeColumn,
     };
 
     /// <summary>
     /// Educational achievement file column name by which the data will be selected.
     /// </summary>
     private static readonly string ConditionEducationalAchievementFileColumn = EducationalAchievementFile.FacultyNamesColumn;
-
-    /// <summary>
-    /// Condition for data selection.
-    /// </summary>
-    private static readonly string EducationalAchievementFileCondition = EducationalAchievementFile.MathMechFacultyName;
 
     /// <summary>
     /// Array of proctoring status file column names from which data should be obtained.
@@ -46,6 +43,15 @@ public class DataHandler
         ProctoringStatusFile.EmailColumn,
         ProctoringStatusFile.ProctoringStatusColumn,
     };
+
+    /// <summary>
+    /// Condition for data selection.
+    /// </summary>
+    private static readonly Func<string, bool> EducationalAchievementFileFacultyCondition =
+        (cellValue) => cellValue.Contains(EducationalAchievementFile.MathMechFacultyName, StringComparison.OrdinalIgnoreCase);
+
+    private static readonly Func<double, bool> EducationalAchievementFileControlTasksCondition =
+        (controlTasksAchievementPercent) => controlTasksAchievementPercent.CompareTo(0) > 0;
 
     private List<(Student, bool)>? studentsDataWithExplicitProctoringStatus;
     private bool isNotNullDataActual;
@@ -63,25 +69,27 @@ public class DataHandler
     /// <summary>
     /// Adds educational achievement data to the storage.
     /// </summary>
-    /// <param name="fileReadStream">Stream with the educational achievement data.</param>
+    /// <param name="fileStream">Stream with the educational achievement data.</param>
     /// <returns>List of row numbers containing errors.</returns>
     /// <exception cref="InvalidInputDataException">Throws if the input data was received in an incorrect format.
     /// View EducationalAchievementFile class as a sample.</exception>
-    public List<string> AddEducationalAchievementData(Stream fileReadStream)
+    public List<string> AddEducationalAchievementData(Stream fileStream)
     {
-        var (educationalAchievmentDataList, errorRows) = XLSXParser.GetDataByTheColumnContainsConditionWithoutFirstRow(
-            fileReadStream,
+        var (educationalAchievmentDataList, errorRows) = XLSXParser.GetDataByTheConditionWithoutFirstRow(
+            fileStream,
             RequiredDataFromEducationalAchievementFile,
             EducationalAchievementFileSignificantColumns,
             ConditionEducationalAchievementFileColumn,
-            EducationalAchievementFileCondition,
+            EducationalAchievementFileFacultyCondition,
             EducationalAchievementFile.AllowedNumberOfErrorRows);
         var educationalAchievmentDataDictionary = new Dictionary<string, Student>();
         foreach (var rowData in educationalAchievmentDataList)
         {
             try
             {
-                var grade = Grade.GetGrade(rowData[4]);
+                var controlTasksAchievement = double.Parse(rowData[5], CultureInfo.InvariantCulture);
+                var grade = EducationalAchievementFileControlTasksCondition(controlTasksAchievement * 100)
+                    ? Grade.GetGrade(rowData[4]) : Grade.Grades.F;
                 var student = new Student(rowData[0], rowData[1], rowData[2], rowData[3], grade.ToString());
                 educationalAchievmentDataDictionary.Add(rowData[0], student);
             }
@@ -193,30 +201,11 @@ public class DataHandler
             }
         }
 
-        try
-        {
-            studentsData.Sort((firstElement, secondElement)
-                    => EmailComparerWithExpectedFormat(firstElement.Item1.Email, secondElement.Item1.Email));
-        }
-        catch (InvalidOperationException)
-        {
-            {
-                throw new InvalidInputDataException(
-                    Messages.GenerateComplexMessage(Messages.UnexpectedEmailFormat, Messages.GetMoreInformation),
-                    Messages.AdvancedUnexpectedEmail);
-            }
-        }
-
+        studentsData.Sort((firstElement, secondElement)
+            => string.Compare(firstElement.Item1.LastName, secondElement.Item1.LastName));
         this.studentsDataWithExplicitProctoringStatus = studentsData;
         this.isNotNullDataActual = true;
         return (studentsData, studentWithoutProctoringEmails);
-    }
-
-    private static int EmailComparerWithExpectedFormat(string firstEmail, string secondEmail)
-    {
-        var firstEmailNumber = int.Parse(firstEmail.Substring(2, 6));
-        var secondEmailNumber = int.Parse(secondEmail.Substring(2, 6));
-        return firstEmailNumber.CompareTo(secondEmailNumber);
     }
 
     private static (bool IsInterpretationCorrect, bool InterpretationResult) InterpretProctoringStatus(

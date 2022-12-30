@@ -13,12 +13,12 @@ public static class ProctoringStatusFile
     /// <summary>
     /// Gets allowed number of rows containing errors.
     /// </summary>
-    public static int AllowedNumberOfErrorRows { get; } = 50;
+    public static int AllowedNumberOfErrorRows { get; } = 150;
 
     /// <summary>
     /// Gets the name of the column that contains student email addresses.
     /// </summary>
-    public static string EmailColumn { get; } = "User";
+    public static string EmailColumn { get; } = "User email";
 
     /// <summary>
     /// Gets the name of the column that contains student proctoring statuses.

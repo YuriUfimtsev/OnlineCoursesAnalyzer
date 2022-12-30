@@ -71,7 +71,7 @@
 
     <div class="row @displayClassInvertion">
         <button class="btn-sm btn-outline-dark btn-block" @onclick="ChangeView">
-            Изменить вид
+            Стандартный вид
         </button>
     </div>
 
@@ -87,9 +87,9 @@
             </TableHeader>
             <RowTemplate>
                 <td>@context.Email</td>
-                <td>@context.SecondName</td>
-                <td>@context.FirstName</td>
                 <td>@context.LastName</td>
+                <td>@context.FirstName</td>
+                <td>@context.SecondName</td>
                 <td>@context.Grade</td>
                 <td>@context.ProctoringStatus</td>
             </RowTemplate>

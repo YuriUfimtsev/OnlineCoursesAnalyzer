@@ -149,7 +149,13 @@ public class XLSXParserTests
     {
         var stream = File.OpenRead(GetPathToFile("StandartData.xlsx"));
         var requiredColumnNames = new[] { "Фамилия", "Имя", "Отчество", "Город", "Страна" };
-        var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataByTheColumnContainsConditionWithoutFirstRow(stream, requiredColumnNames, requiredColumnNames, "Город", "Москва", 10);
+        var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataByTheConditionWithoutFirstRow(
+            stream,
+            requiredColumnNames,
+            requiredColumnNames,
+            "Город",
+            (cellValue) => cellValue == "Москва",
+            10);
         var expectedData = new List<string[]> { new[] { "Петров", "Петр", "Петрович", "Москва", "Россия", "3" } };
         CollectionAssert.AreEquivalent(expectedData, dataWithRowNumbers);
         Assert.That(nullRows.Count, Is.EqualTo(0));
@@ -161,7 +167,13 @@ public class XLSXParserTests
         var stream = File.OpenRead(GetPathToFile("ErrorData.xlsx"));
         var requiredColumnNames = new[] { "Фамилия", "Имя", "Отчество", "Город", "Страна" };
         var significantColumnNames = new[] { "Фамилия", "Город", "Страна" };
-        var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataByTheColumnContainsConditionWithoutFirstRow(stream, requiredColumnNames, significantColumnNames, "Город", "Москва", 5);
+        var (dataWithRowNumbers, nullRows) = XLSXParser.GetDataByTheConditionWithoutFirstRow(
+            stream,
+            requiredColumnNames,
+            significantColumnNames,
+            "Город",
+            (cellValue) => cellValue == "Москва",
+            5);
         var expectedData = new List<string[]>
         {
             new[] { "Петров", "Петр", "Петрович", "Москва", "Россия", "3" },

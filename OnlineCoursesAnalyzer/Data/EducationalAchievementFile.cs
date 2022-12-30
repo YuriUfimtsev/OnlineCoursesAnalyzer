@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace OnlineCoursesAnalyzer.Data;
+﻿namespace OnlineCoursesAnalyzer.Data;
 
 /// <summary>
 /// Implements the storage of key data of the educational achievement file.
@@ -15,12 +13,12 @@ public static class EducationalAchievementFile
     /// <summary>
     /// Gets allowed number of rows containing errors.
     /// </summary>
-    public static int AllowedNumberOfErrorRows { get; } = 10;
+    public static int AllowedNumberOfErrorRows { get; } = 150;
 
     /// <summary>
     /// Gets allowed number of students for which proctoring status may not be found.
     /// </summary>
-    public static int AllowedNumberOfStudentsWithoutProctoringStatus { get; } = 10;
+    public static int AllowedNumberOfStudentsWithoutProctoringStatus { get; } = 150;
 
     /// <summary>
     /// Gets the name of the column that contains student email addresses.
@@ -30,7 +28,7 @@ public static class EducationalAchievementFile
     /// <summary>
     /// Gets the name of the column that contains student surnames.
     /// </summary>
-    public static string SecondNameColumn { get; } = "Second Name";
+    public static string LastNameColumn { get; } = "Last Name";
 
     /// <summary>
     /// Gets the name of the column that contains student names.
@@ -40,12 +38,17 @@ public static class EducationalAchievementFile
     /// <summary>
     /// Gets the name of the column that contains student patronymics.
     /// </summary>
-    public static string LastNameColumn { get; } = "Last Name";
+    public static string SecondNameColumn { get; } = "Second Name";
 
     /// <summary>
     /// Gets the name of the column that contains student grade percents.
     /// </summary>
-    public static string GradePercentColumn { get; } = "Grade percent";
+    public static string GradeColumn { get; } = "Итоговая аттестация (Avg)";
+
+    /// <summary>
+    /// Gets the name of the column that contains student control tasks achievement percents.
+    /// </summary>
+    public static string ControlTasksAchievementColumn { get; } = "Контрольные задания (Avg)";
 
     /// <summary>
     /// Gets the name of the column that contains names of the faculties.

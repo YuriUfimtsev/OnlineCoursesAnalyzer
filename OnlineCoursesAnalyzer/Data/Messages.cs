@@ -25,7 +25,7 @@ public static class Messages
     /// <summary>
     /// Gets "Incorrect file type" message.
     /// </summary>
-    public static string IncorrectFileType { get; } = "Тип файла не соответствует '.xlxs'";
+    public static string IncorrectFileType { get; } = "Тип файла не соответствует '.xlsx'";
 
     /// <summary>
     /// Gets "Insufficient data" message.
@@ -33,22 +33,12 @@ public static class Messages
     public static string NotEnoughData { get; } = "Недостаточно данных. Загрузите файлы";
 
     /// <summary>
-    /// Gets "Unexpected format of the email address" message.
-    /// </summary>
-    public static string UnexpectedEmailFormat { get; } = "Неожиданный формат почтового адреса.";
-
-    /// <summary>
-    /// Gets "Unexpected format of the email address" message with additional data.
-    /// </summary>
-    public static string AdvancedUnexpectedEmail { get; } = $"Неожиданный формат почтового адреса." +
-        $" Проверьте, что все адреса формата {EducationalAchievementFile.ExpectedEmailFormat}.";
-
-    /// <summary>
     /// Generates "The file is being uploaded" message based on the file name.
     /// </summary>
     /// <param name="fileName">File that is being uploaded name.</param>
     /// <returns>Message with the file name.</returns>
-    public static string GenerateFileInProcessUploadMessage(string fileName) => $"Файл '{fileName}' загружается";
+    public static string GenerateFileInProcessUploadMessage(string fileName)
+        => $"Файл '{fileName}' загружается";
 
     /// <summary>
     /// Generates "The file has been uploaded successfully" message based on the file name.
@@ -134,14 +124,16 @@ public static class Messages
             GetMoreInformation);
 
     /// <summary>
-    /// Generates "Processing has been completed with a warning" message with a list of the email addresses of students without proctoring status.
+    /// Generates "Processing has been completed with a warning" message with a list of the email addresses of students
+    /// without proctoring status.
     /// </summary>
     /// <param name="studentEmailAddresses">Email addresses of students without proctoring status.</param>
     /// <returns>Messsage with a list of the email addresses of students without proctoring status.</returns>
     public static string GenerateFilesProcessingWarningMessageWithStudentEmails(List<string> studentEmailAddresses)
     {
         var errorMessage = GenerateErrorMessageWithInvalidElements(
-            $"Обработка завершена. Не найдены данные прохождения прокторинга для {studentEmailAddresses.Count} студентов. А именно: ",
+            $"Обработка завершена. Не найдены данные прохождения прокторинга для {studentEmailAddresses.Count} студентов." +
+            " А именно: ",
             studentEmailAddresses);
         return errorMessage;
     }

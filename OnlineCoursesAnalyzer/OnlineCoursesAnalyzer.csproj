@@ -1,13 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">	
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>b9f183ce-4074-4949-a902-457f385492a6</UserSecretsId>
+	  <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+	  <BlazorWebAssemblyPreserveCollationData>false</BlazorWebAssemblyPreserveCollationData>
+	  <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="6.1.1" />
+    <PackageReference Include="EPPlus" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.9" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435">

@@ -9,12 +9,12 @@ public class Student
     /// Initializes a new instance of the <see cref="Student"/> class.
     /// </summary>
     /// <param name="email">Student email address.</param>
-    /// <param name="secondName">Student surname.</param>
+    /// <param name="lastName">Student surname.</param>
     /// <param name="firstName">Student name.</param>
-    /// <param name="lastName">Student patronymic.</param>
+    /// <param name="secondName">Student patronymic.</param>
     /// <param name="grade">Student grade for course.</param>
     /// <param name="proctoringStatus">Student proctoring status.</param>
-    public Student(string email, string secondName, string firstName, string lastName, string grade, string proctoringStatus)
+    public Student(string email, string lastName, string firstName, string secondName, string grade, string proctoringStatus)
     {
         this.SecondName = secondName;
         this.FirstName = firstName;
@@ -28,12 +28,12 @@ public class Student
     /// Initializes a new instance of the <see cref="Student"/> class.
     /// </summary>
     /// <param name="email">Student email address.</param>
-    /// <param name="secondName">Student surname.</param>
+    /// <param name="lastName">Student surname.</param>
     /// <param name="firstName">Student name.</param>
-    /// <param name="lastName">Student patronymic.</param>
+    /// <param name="secondName">Student patronymic.</param>
     /// <param name="grade">Student grade for course.</param>
-    public Student(string email, string secondName, string firstName, string lastName, string grade)
-        : this(email, secondName, firstName, lastName, grade, string.Empty)
+    public Student(string email, string lastName, string firstName, string secondName, string grade)
+        : this(email, lastName, firstName, secondName, grade, string.Empty)
     {
     }
 
@@ -45,7 +45,7 @@ public class Student
     /// <summary>
     /// Gets the student surname.
     /// </summary>
-    public string SecondName { get; }
+    public string LastName { get; }
 
     /// <summary>
     /// Gets the student name.
@@ -55,7 +55,7 @@ public class Student
     /// <summary>
     /// Gets the student patronymic.
     /// </summary>
-    public string LastName { get; }
+    public string SecondName { get; }
 
     /// <summary>
     /// Gets the student grade for course.
