@@ -6,9 +6,9 @@
 public static class ProctoringStatusFile
 {
     /// <summary>
-    /// Gets maximum estimated file size. 2 megabytes by default.
+    /// Gets maximum estimated file size. 3 megabytes by default.
     /// </summary>
-    public static int MaxAllowedSizeInBytes { get; } = 2097152;
+    public static int MaxAllowedSizeInBytes { get; } =  3 * 1048576;
 
     /// <summary>
     /// Gets allowed number of rows containing errors.
