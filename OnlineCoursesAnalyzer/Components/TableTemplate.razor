@@ -1,0 +1,32 @@
+﻿@typeparam TItem
+@using System.Diagnostics.CodeAnalysis;
+
+<table class="table">
+    <thead>
+        <tr>@TableHeader</tr>
+    </thead>
+    <tbody>
+        @if (Items != null)
+        {
+            foreach (var item in Items)
+            {
+                var backgroundColorClass = item.Item2 ? "standart" : "outstanding";
+                if (RowTemplate is not null)
+                {
+                    <tr class =@backgroundColorClass>@RowTemplate(item.Item1)</tr>
+                }
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public RenderFragment? TableHeader { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem>? RowTemplate { get; set; }
+
+    [Parameter, AllowNull]
+    public IReadOnlyList<(TItem, bool)>? Items { get; set; }
+}
