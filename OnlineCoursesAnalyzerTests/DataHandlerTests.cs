@@ -183,7 +183,6 @@ public class DataHandlerTests
         var (studentsData, errorStudents) = dataHandler.GetResultWithExplicitProctoringStatus();
         Assert.That(errorStudents.Count, Is.EqualTo(0));
         CollectionAssert.AreEquivalent(expectedResult, studentsData);
-        //Assert.That(CompareStudentDataLists(expectedResult, studentsData));
     }
 
     [Test]
