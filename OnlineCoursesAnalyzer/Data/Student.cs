@@ -3,7 +3,7 @@
 /// <summary>
 /// Implements the student representation.
 /// </summary>
-public class Student
+public record Student
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Student"/> class.
@@ -40,27 +40,27 @@ public class Student
     /// <summary>
     /// Gets the student email address.
     /// </summary>
-    public string Email { get; }
+    public string Email { get; init; }
 
     /// <summary>
     /// Gets the student surname.
     /// </summary>
-    public string LastName { get; }
+    public string LastName { get; init; }
 
     /// <summary>
     /// Gets the student name.
     /// </summary>
-    public string FirstName { get; }
+    public string FirstName { get; init; }
 
     /// <summary>
     /// Gets the student patronymic.
     /// </summary>
-    public string SecondName { get; }
+    public string SecondName { get; init; }
 
     /// <summary>
     /// Gets the student grade for course.
     /// </summary>
-    public string Grade { get; }
+    public string Grade { get; init; }
 
     /// <summary>
     /// Gets or sets the student proctoring status.

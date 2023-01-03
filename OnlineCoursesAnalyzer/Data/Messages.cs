@@ -10,27 +10,27 @@ public static class Messages
     /// <summary>
     /// Gets "Get more information" message.
     /// </summary>
-    public static string GetMoreInformation { get; } = "Нажмите, чтобы узнать подробности";
+    public static string GetMoreInformation => "Нажмите, чтобы узнать подробности";
 
     /// <summary>
     /// Gets "Processing completed successfully" message.
     /// </summary>
-    public static string ProcessingCompletedSuccessfully { get; } = "Обработка данных завершена корректно";
+    public static string ProcessingCompletedSuccessfully => "Обработка данных завершена корректно";
 
     /// <summary>
     /// Gets "Processing continues" message.
     /// </summary>
-    public static string InProcess { get; } = "Обработка данных";
+    public static string InProcess => "Обработка данных";
 
     /// <summary>
     /// Gets "Incorrect file type" message.
     /// </summary>
-    public static string IncorrectFileType { get; } = "Тип файла не соответствует '.xlsx'";
+    public static string IncorrectFileType => "Тип файла не соответствует '.xlsx'";
 
     /// <summary>
     /// Gets "Insufficient data" message.
     /// </summary>
-    public static string NotEnoughData { get; } = "Недостаточно данных. Загрузите файлы";
+    public static string NotEnoughData => "Недостаточно данных. Загрузите файлы";
 
     /// <summary>
     /// Generates "The file is being uploaded" message based on the file name.

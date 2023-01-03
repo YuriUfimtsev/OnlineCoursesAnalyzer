@@ -1,5 +1,6 @@
-﻿using OnlineCoursesAnalyzer.Data;
-using System.Globalization;
+﻿using System.Globalization;
+
+using OnlineCoursesAnalyzer.Data;
 
 namespace OnlineCoursesAnalyzer.DataHandling;
 

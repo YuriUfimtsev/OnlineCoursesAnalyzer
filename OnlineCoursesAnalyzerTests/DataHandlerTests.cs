@@ -1,6 +1,5 @@
 ﻿using OnlineCoursesAnalyzer.Data;
 using OnlineCoursesAnalyzer.DataHandling;
-using System.Collections.Specialized;
 
 namespace OnlineCoursesAnalyzerTests;
 
@@ -8,62 +7,6 @@ public class DataHandlerTests
 {
     private static string GetPathToFile(string fileName)
         => $"Data/DataHandlerTestsData/{fileName}";
-
-    private static bool CompareStudents(Student firstStudent, Student secondStudent)
-        => firstStudent.Email == secondStudent.Email
-            && firstStudent.SecondName == secondStudent.SecondName
-            && firstStudent.FirstName == secondStudent.FirstName
-            && firstStudent.LastName == secondStudent.LastName
-            && firstStudent.Grade == secondStudent.Grade
-            && firstStudent.ProctoringStatus == secondStudent.ProctoringStatus;
-
-    private static bool CompareStudentDataDictionaries(Dictionary<string, Student>? firstDictionary,
-        Dictionary<string, Student>? secondDictionary)
-    {
-        if (firstDictionary == null || secondDictionary == null)
-        {
-            return firstDictionary == secondDictionary;
-        }
-
-        if (firstDictionary.Count != secondDictionary.Count)
-        {
-            return false;
-        }
-
-        foreach (var keyValuePair in firstDictionary)
-        {
-            if (!secondDictionary.ContainsKey(keyValuePair.Key)
-                || !CompareStudents(secondDictionary[keyValuePair.Key], keyValuePair.Value))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static bool CompareStudentDataLists(List<(Student, bool)> firstData, List<(Student, bool)> secondData)
-    {
-        if (firstData.Count != secondData.Count)
-        {
-            return false;
-        }
-
-        var comparasion = new Comparison<(Student, bool)>(
-            (firstElement, secondElement) => string.Compare(firstElement.Item1.Email, secondElement.Item1.Email));
-        firstData.Sort(comparasion);
-        secondData.Sort(comparasion);
-
-        for (var i = 0; i < firstData.Count; ++i)
-        {
-            if (!CompareStudents(firstData[i].Item1, secondData[i].Item1) || firstData[i].Item2 != secondData[i].Item2)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     [SetUpFixture]
     public class GlobalSetup
@@ -102,7 +45,7 @@ public class DataHandlerTests
         };
         var errorRows = dataHandler.AddEducationalAchievementData(fileStream);
         Assert.That(errorRows.Count, Is.EqualTo(0));
-        Assert.That(CompareStudentDataDictionaries(expectedData, dataHandler.EducationalAchievementData));
+        CollectionAssert.AreEquivalent(expectedData, dataHandler.EducationalAchievementData);
     }
 
     [Test]
@@ -120,7 +63,7 @@ public class DataHandlerTests
         };
         var errorRows = dataHandler.AddEducationalAchievementData(fileStream);
         Assert.That(errorRows.Count, Is.EqualTo(0));
-        Assert.That(CompareStudentDataDictionaries(expectedData, dataHandler.EducationalAchievementData));
+        CollectionAssert.AreEquivalent(expectedData, dataHandler.EducationalAchievementData);
     }
 
     [Test]
@@ -136,7 +79,7 @@ public class DataHandlerTests
         };
         var errorRows = dataHandler.AddEducationalAchievementData(fileStream);
         Assert.That(errorRows.Count, Is.EqualTo(0));
-        Assert.That(CompareStudentDataDictionaries(expectedData, dataHandler.EducationalAchievementData));
+        CollectionAssert.AreEquivalent(expectedData, dataHandler.EducationalAchievementData);
     }
 
     [Test]
@@ -224,7 +167,7 @@ public class DataHandlerTests
     }
 
     [Test]
-    public void GetResultStandartTest() /////
+    public void GetResultStandartTest()
     {
         var dataHandler = new DataHandler();
         var educationalAchievementFileStream = File.OpenRead(GetPathToFile("EducationalAchievmentStandartData.xlsx"));
@@ -239,7 +182,8 @@ public class DataHandlerTests
         };
         var (studentsData, errorStudents) = dataHandler.GetResultWithExplicitProctoringStatus();
         Assert.That(errorStudents.Count, Is.EqualTo(0));
-        Assert.That(CompareStudentDataLists(expectedResult, studentsData));
+        CollectionAssert.AreEquivalent(expectedResult, studentsData);
+        //Assert.That(CompareStudentDataLists(expectedResult, studentsData));
     }
 
     [Test]
